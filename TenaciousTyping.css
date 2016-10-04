@@ -1,0 +1,148 @@
+html {
+    
+    background-color: #99d6ff;
+    background-size: cover;
+}
+
+.center {
+
+    float: none;
+    text-align: center;
+}
+
+.huge {
+    
+    font-size: 200%;
+}
+
+.heading-div {
+
+    font-family: "Hoefler Text", "Baskerville Old Face", "Garamond", "Times New Roman", serif;
+    text-align: center;
+    text-decoration-style: wavy;
+    font-size: 200%;
+    background-color: #111111;
+    border: 5px solid #000000;
+    color: #ffffff;
+    max-width: 86%;
+    margin-left: 7%;
+    margin-right: 7%;
+}
+
+.body-div {
+    
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    color: #ffffff;
+    background-color: #007bbc;
+    max-width: 86%;
+    padding: 5%;
+    border: 5px solid #000000;
+    margin-left: 7%;
+    margin-right: 7%;
+}
+
+#bottomBar-div {
+
+}
+
+/* Default div property */
+
+div {
+    
+    background-color: #cccccc;
+    max-width: 86%;
+    padding: 5%;
+    border: 5px solid #333333;
+    margin-left: 7%;
+    margin-right: 7%;
+}
+
+header {
+        
+    background-color: #cccccc;
+    border: 5px solid #333333;
+    padding: 5%;
+    max-width: 86%;
+    margin-top: auto;
+    margin-left: 7%;
+    margin-right: 7%;
+}
+
+.img-round {
+    
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+}
+
+footer {
+
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    color: #ffffff;
+    background-color: #333;
+    text-align: center;
+}
+
+nav {
+
+    color: white;
+    margin: 0;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+ul {
+    
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333333;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li a {
+
+    float: left;
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    padding: 16px;
+    text-decoration: none;
+}
+
+article {
+
+    background-color: #777fff;
+    margin-right: 7%;
+    border-right: 1px solid #333333;
+    padding: 1em;
+    overflow: hidden;
+}
+
+body {
+
+    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    margin: 0;
+}
+
+p {
+    
+    text-indent: 50px;
+}
+
+li a:hover:not(.active) {
+    
+    background-color: #007bbc;
+}
+
+.active {
+    
+    background-color: #A33333;
+}
