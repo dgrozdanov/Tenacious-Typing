@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta charset = "utf-8">
+        <title>Tenacious Typing</title>
+        <meta name = "description" content = "A fun way to get better at typing!">
+	<meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+	<link rel = "stylesheet" href = "TenaciousTyping.css">
+    </head>
+    
+    <body onload = "launchGame()">
+        
+        <nav>
+            <ul>
+                <li> <a href = "#Introduction"> Introduction</a></li>
+                <li> <a href = "#Statement"> Mission Statement</a></li>
+                <li> <a href = "#Games"> Games</a></li>
+                <li> <a href= "mailto:dmitri@cs.unc.edu"> Email Us</a></li>
+            </ul>
+        </nav>
+
+        <a id = "Introduction"> </a>
+
+        <br><br><br><br>
+    
+        <div class = "heading-div">
+            
+            Tenacious Typing
+    
+        </div>
+    
+        <div class = "body-div center">
+
+            Welcome to a fun way to get better at typing!
+
+        </div>
+        
+        <a id = "Statement"> </a>
+        <br><br>
+
+        <div class = "heading-div">
+
+            Mission Statetement
+            
+        </div>
+
+        <div class = "body-div center">
+
+            We are a group of computer scientists who want to make the world a bit better.
+            <br>
+            Although this particular piece of software is designed for blind and visually impaired children, it is open for everyone to use.
+            <br>
+            Our software is both free and educational, but using it constitutes your agreement to assume all risk associated with its use.
+
+        </div>
+        
+        <a id = "Games"> </a>
+        <br><br>
+        
+        <div class = "heading-div">
+        
+            Games
+            
+        </div>
+        
+	<div class = "body-div center">
+
+		Please your your arrow keys to move the square around the screen.
+		<br>
+		You can also press any other key on your keyboard to play a sound!
+		<br>
+		The most important rule is: <strong>have fun!</strong>
+	</div>
+
+        <div id = "divLaunchGame">
+		
+		<script>
+		
+			var gamePiece;
+			var badGuy;
+
+			function launchGame() {
+
+				gamePiece = new component(30, 30, "blue", 10, 10);
+				badGuy = new component(30, 30, "red", 100, 40);
+				gameMap.start();
+				var intro1 = new SpeechSynthesisUtterance("Welcome to Tenacious Typing! This game is still in development.");
+				var intro2 = new SpeechSynthesisUtterance("Scroll down to the bottom to find the game. Use your arrow keys to move. Press any other key to hear a sound!");			
+				window.speechSynthesis.speak(intro1);
+				window.speechSynthesis.speak(intro2);
+			}
+
+
+			var gameMap = {
+
+				canvas : document.createElement("canvas"),
+				start : function() {
+
+					var div = document.getElementById("divLaunchGame");
+					this.canvas.width = 700;
+					this.canvas.height = 400;
+					this.context = this.canvas.getContext("2d");
+					div.appendChild(this.canvas);
+					this.interval = setInterval(updateGameMap, 20);
+				},
+
+				clear : function() {
+
+					this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+				}
+			}
+
+			function component(width, height, color, x, y) {
+
+				this.width = width;
+				this.height = height;
+				this.speedX = 0;
+				this.speedY = 0;
+				this.x = x;
+				this.y = y;
+				this.update = function() {
+					ctx = gameMap.context;
+					ctx.fillStyle = color;
+					ctx.fillRect(this.x, this.y, this.width, this.height);
+				}
+
+				this.newPosition = function() {
+					this.x += this.speedX;
+					this.y += this.speedY;
+				}
+			}
+
+			function updateGameMap() {
+
+				gameMap.clear();
+				gamePiece.newPosition();
+				gamePiece.update();
+			}
+
+			function shiftUp() {
+				gamePiece.speedY = -1;
+			}
+
+			function shiftDown() {
+				gamePiece.speedY = 1;
+			}
+
+			function shiftLeft() {
+				gamePiece.speedX = -1;
+			}
+
+			function shiftRight() {
+				gamePiece.speedX = 1;
+			}
+
+			function stopMoving() {
+				gamePiece.speedX = 0;
+				gamePiece.speedY = 0;
+			}
+
+			window.onkeydown = function(e) {
+
+				var letter;
+
+				if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+					e.preventDefault();
+				}
+				if (e.keyCode == 37) {
+					letter = new SpeechSynthesisUtterance("Left");
+					shiftLeft();
+				}
+				else if (e.keyCode == 38) {
+                                        letter = new SpeechSynthesisUtterance("Up");
+					shiftUp();
+				}
+				else if (e.keyCode == 39) {
+                                        letter = new SpeechSynthesisUtterance("Right");
+					shiftRight();
+				}
+				else if (e.keyCode == 40) {
+					letter = new SpeechSynthesisUtterance("Down");	
+					shiftDown();
+				}
+				else if (e.keyCode == 48) 
+					letter = new SpeechSynthesisUtterance("0");
+				else if (e.keyCode == 49)
+                                        letter = new SpeechSynthesisUtterance("1");
+                                else if (e.keyCode == 50)
+                                        letter = new SpeechSynthesisUtterance("2");
+                                else if (e.keyCode == 51)
+                                        letter = new SpeechSynthesisUtterance("3");
+				else if (e.keyCode == 52)
+                                        letter = new SpeechSynthesisUtterance("4");
+				else if (e.keyCode == 53)
+					letter = new SpeechSynthesisUtterance("5");
+				else if (e.keyCode == 54)
+					letter = new SpeechSynthesisUtterance("6");
+				else if (e.keyCode == 55)
+                                        letter = new SpeechSynthesisUtterance("7");
+                                else if (e.keyCode == 56)
+                                        letter = new SpeechSynthesisUtterance("8");
+                                else if (e.keyCode == 57)
+                                        letter = new SpeechSynthesisUtterance("9");
+                                else if (e.keyCode == 65)
+                                        letter = new SpeechSynthesisUtterance("a");
+                                else if (e.keyCode == 66)
+                                        letter = new SpeechSynthesisUtterance("bee");
+                                else if (e.keyCode == 67)
+                                        letter = new SpeechSynthesisUtterance("cee");
+                                else if (e.keyCode == 68)
+                                        letter = new SpeechSynthesisUtterance("dee");
+                                else if (e.keyCode == 69)
+                                        letter = new SpeechSynthesisUtterance("ee");
+                                else if (e.keyCode == 70)
+                                        letter = new SpeechSynthesisUtterance("f");
+                                else if (e.keyCode == 71)
+                                        letter = new SpeechSynthesisUtterance("gee");
+                                else if (e.keyCode == 72)
+                                        letter = new SpeechSynthesisUtterance("h");
+                                else if (e.keyCode == 73)
+                                        letter = new SpeechSynthesisUtterance("eye");
+				else if (e.keyCode == 74)
+                                        letter = new SpeechSynthesisUtterance("jay");
+                                else if (e.keyCode == 75)
+                                        letter = new SpeechSynthesisUtterance("kay");
+                                else if (e.keyCode == 76)
+                                        letter = new SpeechSynthesisUtterance("el");
+                                else if (e.keyCode == 77)
+                                        letter = new SpeechSynthesisUtterance("em");
+                                else if (e.keyCode == 78)
+                                        letter = new SpeechSynthesisUtterance("en");
+                                else if (e.keyCode == 79)
+                                        letter = new SpeechSynthesisUtterance("ohh");
+                                else if (e.keyCode == 80)
+                                        letter = new SpeechSynthesisUtterance("pea");
+                                else if (e.keyCode == 81)
+                                        letter = new SpeechSynthesisUtterance("q");
+                                else if (e.keyCode == 82)
+                                        letter = new SpeechSynthesisUtterance("r");
+                                else if (e.keyCode == 83)
+                                        letter = new SpeechSynthesisUtterance("s");
+                                else if (e.keyCode == 84)
+                                        letter = new SpeechSynthesisUtterance("tee");
+                                else if (e.keyCode == 85)
+                                        letter = new SpeechSynthesisUtterance("you");
+                                else if (e.keyCode == 86)
+                                        letter = new SpeechSynthesisUtterance("vee");
+				else if (e.keyCode == 87)
+                                        letter = new SpeechSynthesisUtterance("w");
+                                else if (e.keyCode == 88)
+                                        letter = new SpeechSynthesisUtterance("ex");
+                                else if (e.keyCode == 89)
+                                        letter = new SpeechSynthesisUtterance("why");
+                                else if (e.keyCode == 90)
+                                        letter = new SpeechSynthesisUtterance("zee");
+				else
+					letter = new SpeechSynthesisUtterance("Try a different key");
+
+				letter.rate = 3;
+				letter.volume = 1;
+				window.speechSynthesis.speak(letter);
+			}
+
+			window.onkeyup = function() {
+				stopMoving();
+			}
+
+
+              </script>		
+		
+        </div>
+        
+        
+        
+        <br><br><br><br>
+
+        <footer>
+            
+            Created by geeks making the world a bit better.
+            <br>
+            Please feel free to use this software for educational purposes.
+            
+        </footer>
+        
+    </body>
+    
+</html>
