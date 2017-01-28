@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "icon" type = "image/png" href = "../data/favicons/maze-day.ico">
+    <title>Tenacious Typing</title>
+    <meta name = "description" content = "A fun way to get better at typing!">
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+    <link rel = "stylesheet" href = "tenacious-typing.css">
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src = "../nav-bar.js"></script>
+    <script src = "tenacious-typing.js"></script>
+    <script type = "text/javascript" src = "../node_modules/artyom.js/src/artyom.min.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.1/howler.js"></script>
+  </head>
+
+  <body onload = "launchGame()">
+
+    <ul class = "navbar" id = "topNavBar">
+
+        <li><img src = "/maze-day/media/maze-day.ico" id = "navImage" alt = "Logo"></li>
+        <li> <a class = "active" href = "../maze-day.html">Return to Maze Day</a></li>
+        <li> <a href= "mailto:dmitri@cs.unc.edu"> Email Us</a></li>
+        <div class = "floatRight">
+          <li><a onclick = "skipQuestion()">Skip Question</a></li>
+          <li><a onclick = "muteMusic()">Toggle Music</a></li>
+          <li><a onclick = "resetGame()">Reset Game</a></li>
+        </div>
+        <!--<li><input id = "mobileKey" name = "mobileKey" type = "text" placeholder = "open mobile keyboard"></li>-->
+        <li class = "icon"> <a href = "javascript:void(0);"
+          style = "font-size: 15px;" onclick = "scalableNav()">=</a></li>
+    </ul>
+    <br>
+
+    <div id = "divLaunchGame">
+
+      <div id = "splashScreen">
+
+        <br><br>
+        <h2>Loading...</h2>
+        <img src = "/maze-day/media/splash-screen.png" id = "splashImage" alt = "Maze Day">
+        <!--a href="#" class="enter_link">Play</a-->
+      </div>
+
+    </div>
+
+    <footer>
+
+      Created by geeks making the world a bit better.
+
+    </footer>
+
+  </body>
+</html>

@@ -1,136 +1,338 @@
+//TODO:
+//Alert user when spelling error has occured!
+//Add game component to this - maybe telling a story from Tarheel Reader and pick random words to spell
+//Give ability to spell out a word
+//Make a voice menu of possible commands
+//Add PHP/SQL comment system and word speakPoints
+//Rewrite in React
+
+//Music
+var backgroundMusic;
+//Array
+var word;
+var soundArray;
+//Strings
 var prompt;
-var promptInc = 0;
-var points = 0;
-var letter;
-var keyPressed = false;
-var prompt = ["maze", "day", "fun"];
-
-var winner = false;
 var text;
-var correct = false;
-var incorrect = false;
+var letter;
+//Integers
+var points;
+var wrongInc;
+var fontInc;
+var optionInc;
+var soundInc;
+var promptInc;
 var spellingErrorAt;
-
+//Booleans
+var hasInput;
+var hasMic;
+var musicPause;
+var loaded;
+var choosingMode;
+var keyPressed;
+var gameOver;
+var correct;
+var incorrect;
+//Speech synthesis
+var utterance;
+//Update parameters for width, height, and font
 var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
 var deviceHeight = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-
-var width;
-var height;
+var primaryFont = (deviceWidth/1920 * 50);//As a ratio of 50px font on 1920 screen
+var secondaryFont = (deviceWidth/1920 * 25);//As a ratio of 25px font on 1920 screen
+var mediumFont = (deviceWidth/1920 * 75);//As a ratio of 25px font on 1920 screen
+var largeFont = (deviceWidth/1920 * 100);//As a ratio of 100px font on 1920 screen
+var superFont = (deviceWidth/1920 * 200);//As a ratio of 200px font on 1920 screen
+var canvasWidth = deviceWidth;//100% of screen width
+var canvasHeight = deviceHeight*.6;//75% of screen height
 
 function launchGame() {
 
-	var intro = new SpeechSynthesisUtterance
-	("Welcome to Tenacious Typing!");
-	window.speechSynthesis.speak(intro);
+	document.getElementById("splashImage").width = deviceWidth*.98;
+	document.getElementById("splashImage").height = deviceHeight*.8;
+	document.getElementById("navImage").width = deviceWidth*.05;
+	document.getElementById("navImage").height = deviceHeight*.05;
 
-	gameMap.start();
+	word = new Array();
+	//Variables initialized to default values
+	prompt = ["maze", "day", "fun"];
+	points = 0;
+	wrongInc = 0;
+	fontInc = 0;
+	optionInc = 0;
+	soundInc = 0;
+	promptInc = 0;
+	//Booleans set to default false values
+	hasMic = false;
+	hasInput = false;
+	musicPause = false;
+	loaded = false;
+	choosingMode = true;
+	keyPressed = false;
+	gameOver = false;
+	correct = false;
+	incorrect = false;
+	//Speech synthesis initialized
+	utterance = new SpeechSynthesisUtterance();
+	utterance.rate = 3;
+	utterance.volume = 1;
+
+	//Sequence of commands to launch voice command software and listen for key words
+	artyom.initialize({
+
+		lang:"en-GB",
+		continuous:true,
+		debug:false,
+		listen:true
+	});
+
+	artyom.addCommands({
+
+		indexes:["New York"],
+		action: function(i) {
+
+				artyom.say("I love New York");
+		},
+		indexes:["Boston"],
+		action: function(i) {
+
+				artyom.say("I love Boston");
+		},
+		indexes:["Houston"],
+		action: function(i) {
+
+				artyom.say("I love Houston");
+		}
+	});
+
+
+	artyom.addCommands({
+
+		indexes:["Restart"],
+		action: function(i) {
+
+				resetGame();
+		}
+	});
+
+	artyom.addCommands({
+
+		indexes:["Left"],
+		action: function(i) {
+
+				optionLeft();
+		}
+	});
+
+	artyom.addCommands({
+
+		indexes:["Right"],
+		action: function(i) {
+
+				optionRight();
+		}
+	});
+
+	artyom.addCommands({
+
+		indexes:["Play"],
+		action: function(i) {
+
+				choosingMode = false;
+		}
+	});
+
+	artyom.addCommands({
+
+		indexes:["Skip"],
+		action: function(i) {
+
+				artyom.say("Are you sure you want to skip this question?");
+
+
+				artyom.addCommands({
+
+					indexes:["Yes","Please"],
+					action: function(i) {
+
+							artyom.say("Skipping");
+							skipQuestion();
+					}
+				});
+
+
+			//	artyom.say("Skipping");
+			//	skipQuestion();
+		}
+	});
+
+	artyom.addCommands({
+
+		indexes:["Mute"],
+		action: function(i) {
+
+				muteMusic();
+				artyom.say("Muted");
+		}
+	});
+
+	artyom.addCommands({
+
+		indexes:["Play music"],
+		action: function(i) {
+
+				backgroundMusic.play();
+				artyom.say("Playing");
+		}
+	});
+
+	artyom.addCommands({
+
+		indexes:["Microphone"],
+		action: function(i) {
+
+				hasMic = true;
+				hasInput = true;
+		}
+	});
+
+	artyom.say("Loading");
+
+	//Background music played on loop with queue for other game sounds
+	backgroundMusic = new Howl({
+
+		src: ["media/TTTheme.wav"],
+		loop: true,
+		volume: 0.2,
+		onload: function() {
+
+			//Game canvas loaded, launching the game
+			$('#splashScreen').fadeOut(10);
+
+
+			loaded = true;
+			gameMap.start();
+			updateGameMap();
+			playWelcome();
+		},
+		onplay: function() {
+
+			musicPause = false;
+		},
+		onpause: function() {
+
+			musicPause = true;
+		}
+	});
+
+	backgroundMusic.play();
 }
 
-var gameMap = {
+function muteMusic() {
 
-	canvas : document.createElement("canvas"),
-	start : function() {
+	if (musicPause == true) {
 
-		getPrompt();
-		speakPrompt();
-
-		var div = document.getElementById("divLaunchGame");
-
-		var cs = getComputedStyle(div);
-		width = parseInt(cs.getPropertyValue('width'), 10);
-		height = deviceHeight*.6;//60% of screen height
-		//var height = parseInt(cs.getPropertyValue('height'), 10);
-
-		this.canvas.width = width;
-		this.canvas.height = height;
-		this.context = this.canvas.getContext("2d");
-		div.appendChild(this.canvas);
-		this.interval = setInterval(updateGameMap, 20);
-	},
-
-	clear : function() {
-
-		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	}
-}
-
-function updateGameMap() {
-
-	gameMap.clear();
-
-	var primaryFont = (deviceWidth/1920 * 50);//As a ratio of 50px font on 1920 screen
-	var secondaryFont = (deviceWidth/1920 * 25);//As a ratio of 25px font on 1920 screen
-	var largeFont = (deviceWidth/1920 * 100);//As a ratio of 100px font on 1920 screen
-
-	ctx = gameMap.context;
-	ctx.fillStyle = "black";
-	ctx.font = primaryFont + "px Arial";
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-
-	var instruction = "";
-
-	if (winner == true) {
-
-		text = "Awesome! You win!";
-		ctx.fillStyle = "purple";
-		ctx.font = largeFont + "px Arial";
-	}
-
-	else if (correct == true) {
-
-		text = "Good job!";
+		backgroundMusic.play();
 	}
 
 	else {
 
-		instruction = "Your word is";
-		text = "\"" + getPrompt() + "\"";
+		backgroundMusic.pause();
 	}
+}
 
-	ctx.fillText(instruction, width/2, height/2 - 1.5*primaryFont);
-	ctx.fillText(text, width/2, height/2);
+function selectMode(optionInc) {
 
-	if (incorrect) {
+	if (optionInc == 1) {
 
-		ctx.fillStyle = "red";
-		ctx.fillText("Try again", width/2, height/2 + primaryFont);
-	}
-
-	if (spellingErrorAt != null) {
-
-		var correctPart = word.join("").substring(0, spellingErrorAt);
-
-		ctx.fillStyle = "green";
-		ctx.fillText(correctPart, width/2, height/2 + primaryFont);
-
-		var incorrectPartOffset = ctx.measureText(correctPart).width;
-
-		var incorrectPart = word.join("").substring(spellingErrorAt, word.join("").length);
-
-		ctx.textAlign = "left";
-
-		ctx.fillStyle = "red";
-		ctx.fillText(incorrectPart, width/2 + incorrectPartOffset, height/2 + primaryFont);
+		//Method: lets you continue to type, even if you are wrong
+		//loadSpell();
 	}
 
 	else {
 
-		ctx.fillStyle = "green";
-		ctx.fillText(word.join(""), width/2, height/2 + primaryFont);
+		//Method: if wrong, prevents you from typing further
+		//loadGuided();
 	}
+}
 
-	ctx.font = secondaryFont + "px Arial";
-	ctx.fillStyle = "black";
-	ctx.textAlign = "left";
-	ctx.fillText("Points: " + points, 30, 30);
-	ctx.fillText("Win at 30 points ", 30, 30 + secondaryFont);
+function optionLeft() {
+
+	if (optionInc != 0) {
+
+		optionInc--;
+	}
+}
+
+function optionRight() {
+
+	if (optionInc != 1) {
+
+		optionInc++;
+	}
+}
+
+function playWelcome() {
+
+	var sound = new Howl({
+
+		src: ["media/welcome.mp3"],
+		volume: 1
+	});
+
+	sound.play();
+
+	artyom.say("Do you have a microphone? Say microphone if you do, or press enter if you don't.");
+
+
+
+	/*setTimeout(function() {
+
+		choosingMode = false;
+	}, 5000);*/
+}
+
+function playPrompt() {
+
+	var sound = new Howl({
+
+		src: ["media/prompt.mp3"],
+		volume: 1,
+		onend: function() {
+
+			var utterancePrompt = new SpeechSynthesisUtterance(prompt[promptInc]);
+			window.speechSynthesis.speak(utterancePrompt);
+		}
+	});
+
+	sound.play();
+}
+
+function playGood() {
+
+	var sound = new Howl({
+
+		src: ["media/good.mp3"],
+		volume: 1,
+		onend: function() {
+
+			nextPrompt();
+		}
+	});
+
+	sound.play();
+}
+
+function skipQuestion() {
+
+	if (!choosingMode) {
+
+		nextPrompt();
+	}
+	//updateGameMap();
 }
 
 function nextPrompt() {
-
-	var utteranceCongrat = new SpeechSynthesisUtterance("Good job!");
-	window.speechSynthesis.speak(utteranceCongrat);
 
 	if (getPoints() >= (prompt.length * 10)) {
 
@@ -139,18 +341,19 @@ function nextPrompt() {
 
 	promptInc++;
 
-	speakPrompt();
+	if (promptInc == prompt.length) {
+
+		return winGame();
+	}
+
+	playPrompt();
+
+	return updateGameMap();
 }
 
 function getPrompt() {
 
 	return prompt[promptInc];
-}
-
-function speakPrompt() {
-
-	var utterancePrompt = new SpeechSynthesisUtterance("The prompt is " + prompt[promptInc]);
-	window.speechSynthesis.speak(utterancePrompt);
 }
 
 function addPoints() {
@@ -171,7 +374,7 @@ function speakPoints() {
 
 function checkAnswer() {
 
-	document.getElementById("gameInput").value = "";
+	//document.getElementById("gameInput").value = "";
 
 	var utteranceWord = new SpeechSynthesisUtterance(word.join(""));
 
@@ -185,9 +388,11 @@ function checkAnswer() {
 		setTimeout(function() {
 
 			correct = false;
+			updateGameMap();
 		}, 3000);
 
-		return nextPrompt();
+		playGood();
+		return updateGameMap();
 	}
 
 	incorrect = true;
@@ -195,15 +400,28 @@ function checkAnswer() {
 	setTimeout(function() {
 
 		incorrect = false;
+		updateGameMap();
 	}, 1500);
 
-	var utteranceStatus = new SpeechSynthesisUtterance("try again");
-	window.speechSynthesis.speak(utteranceStatus);
+	wrongInc++;
+
+	if (wrongInc == 5) {
+
+		var utteranceStatus = new SpeechSynthesisUtterance("To skip this question, say skip question.");
+		window.speechSynthesis.speak(utteranceStatus);
+	}
+
+	else {
+
+		var utteranceStatus = new SpeechSynthesisUtterance("try again");
+		window.speechSynthesis.speak(utteranceStatus);
+	}
 }
 
 function winGame() {
 
-	winner = true;
+	gameOver = true;
+	updateGameMap();
 
 	utteranceWin = new SpeechSynthesisUtterance("Awesome, you win! Press the backspace key to play again.");
 	window.speechSynthesis.speak(utteranceWin);
@@ -211,7 +429,9 @@ function winGame() {
 
 function resetGame() {
 
-		location.reload();
+		backgroundMusic.stop();
+		launchGame();
+		//location.reload();
 }
 
 window.onkeydown = function(e) {
@@ -227,17 +447,26 @@ window.onkeydown = function(e) {
 
 	if (e.keyCode == 8) {
 
-		if (winner) {
-
-			return resetGame();
-		}
-
 		letter = "backspace";
 	}
 
 	else if (e.keyCode == 13) {
 
-		letter = "enter";
+		if (choosingMode) {
+
+			choosingMode = false;
+			playPrompt();
+		}
+
+		else if (gameOver) {
+
+			return resetGame();
+		}
+
+		else {
+
+			letter = "enter";
+		}
 	}
 
 	else if (e.keyCode == 16) {
@@ -253,6 +482,11 @@ window.onkeydown = function(e) {
 	else if (e.keyCode == 37) {
 
 		letter = "left";
+
+		if (choosingMode) {
+
+			optionLeft();
+		}
 	}
 
 	else if (e.keyCode == 38) {
@@ -263,6 +497,11 @@ window.onkeydown = function(e) {
 	else if (e.keyCode == 39) {
 
 		letter = "right";
+
+		if (choosingMode) {
+
+			optionRight();
+		}
 	}
 
 	else if (e.keyCode == 40) {
@@ -272,18 +511,19 @@ window.onkeydown = function(e) {
 
 	else if (e.keyCode == 48) {
 
-		letter = "0";
+		//letter = "0";
+		artyom.say("Voice control menu: Say mute to mute the music, say skip to skip a question, say restart to restart the game");
 	}
 
 	else if (e.keyCode == 49) {
 
-		letter = "1";
+		//letter = "1";
 		return speakPrompt();
 	}
 
 	else if (e.keyCode == 50) {
 
-		letter  = "2";
+		//letter  = "2";
 		return speakPoints();
 	}
 
@@ -319,7 +559,8 @@ window.onkeydown = function(e) {
 
 	else if (e.keyCode == 57) {
 
-		letter = "9";
+		//letter = "9";
+		artyom.say("Keyboard control menu: Press 1 to heat the prompt, press 2 to skip a question, press 3 to restart the game.");
 	}
 
 	else if (e.keyCode == 65) {
@@ -457,15 +698,16 @@ window.onkeydown = function(e) {
 		letter = "try again";
 	}
 
-	var utteranceLetter = new SpeechSynthesisUtterance(letter);
-	utteranceLetter.rate = 3;
-	utteranceLetter.volume = 1;
-	window.speechSynthesis.speak(utteranceLetter);
+	if (letter != "") {
 
-	return wordMaker(letter);
+		utterance = new SpeechSynthesisUtterance(letter);
+		window.speechSynthesis.speak(utterance);
+	}
+
+	wordMaker(letter);
+
+	return updateGameMap();
 }
-
-var word = new Array();
 
 function wordMaker(newLetter) {
 
@@ -524,4 +766,150 @@ function wordMaker(newLetter) {
 window.onkeyup = function() {
 
 	keyPressed = false;
+}
+
+var gameMap = {
+
+	canvas : document.createElement("canvas"),
+	start : function() {
+
+		var div = document.getElementById("divLaunchGame");
+
+		this.canvas.width = canvasWidth;
+		this.canvas.height = canvasHeight*.6;
+		this.context = this.canvas.getContext("2d");
+		div.appendChild(this.canvas);
+		//this.interval = setInterval(updateGameMap, 500);
+	},
+
+	clear : function() {
+
+		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+}
+
+function updateGameMap() {
+
+	gameMap.clear();
+
+	deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+	deviceHeight = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+
+	gameMap.canvas.width = deviceWidth;
+	gameMap.canvas.height = deviceHeight;//60% of screen height
+
+	ctx = gameMap.context;
+	ctx.fillStyle = "white";
+	ctx.font = primaryFont + "px Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+
+	var instruction = "";
+
+	if (choosingMode) {
+
+		//document.getElementById("divLaunchGame").style.background = 'yellow';
+
+		if (fontInc % 2 == 0) {
+
+			ctx.font = "bold " + mediumFont + "px Arial";
+		}
+
+		else if (fontInc % 2 == 1) {
+
+			ctx.font = "bold " + primaryFont + "px Arial";
+		}
+
+		fontInc++;
+
+		ctx.fillText("Welcome to Tenacious Typing!", canvasWidth/2, canvasHeight/2 - 3*primaryFont);
+
+		ctx.font = primaryFont + "px Arial";
+
+		ctx.fillText("Select your game mode:", canvasWidth/2, canvasHeight/2);
+
+		if (optionInc == 0) {
+
+			ctx.fillText("Spelling", canvasWidth/2, canvasHeight/2 + 2*primaryFont);
+		}
+
+		else {
+
+			ctx.fillText("Guided", canvasWidth/2, canvasHeight/2 + 2*primaryFont);
+		}
+
+		ctx.fillText("Press enter to start!", canvasWidth/2, canvasHeight/2 + 5*primaryFont);
+	}
+
+	else if (gameOver) {
+
+		if (fontInc % 2 == 0) {
+
+			ctx.font = "bold " + mediumFont + "px Arial";
+		}
+
+		else if (fontInc % 2 == 1) {
+
+			ctx.font = "bold " + primaryFont + "px Arial";
+		}
+
+		fontInc++;
+
+		ctx.fillText("Awesome, you win!", canvasWidth/2, canvasHeight/2 - 3*primaryFont);
+		ctx.font = primaryFont + "px Arial";
+		ctx.fillText("Wanna play again? Press enter!", canvasWidth/2, canvasHeight/2);
+	}
+
+	else {
+
+		ctx.font = superFont + "px Arial";
+
+		if (correct) {
+
+			text = "Good job!";
+		}
+
+		else {
+
+			instruction = "Your word is";
+			text = "\"" + getPrompt() + "\"";
+		}
+
+		ctx.fillText(instruction, canvasWidth/2, canvasHeight/2);
+		ctx.fillText(text, canvasWidth/2, canvasHeight/2 + superFont);
+
+		if (incorrect) {
+
+			ctx.fillStyle = "red";
+			ctx.fillText("try again", canvasWidth/2, canvasHeight/2 + superFont*2);
+		}
+
+		if (spellingErrorAt != null) {
+
+			var correctPart = word.join("").substring(0, spellingErrorAt);
+
+			ctx.fillStyle = "green";
+			ctx.fillText(correctPart, canvasWidth/2, canvasHeight/2 + superFont*2);
+
+			var incorrectPartOffset = ctx.measureText(correctPart).width;
+
+			var incorrectPart = word.join("").substring(spellingErrorAt, word.join("").length);
+
+			ctx.textAlign = "left";
+
+			ctx.fillStyle = "red";
+			ctx.fillText(incorrectPart, canvasWidth/2 + incorrectPartOffset, canvasHeight/2 + superFont*2);
+		}
+
+		else {
+
+			ctx.fillStyle = "green";
+			ctx.fillText(word.join(""), canvasWidth/2, canvasHeight/2 + superFont*1.5);
+		}
+
+		ctx.font = largeFont + "px Arial";
+		ctx.fillStyle = "white";
+		ctx.textAlign = "left";
+		ctx.fillText("Score: " + points + "/30", canvasWidth*.03, canvasHeight*.14);
+	}
 }
