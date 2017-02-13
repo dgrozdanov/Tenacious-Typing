@@ -2,6 +2,12 @@ html {
 
 	background: url(/maze-day/media/logo.png) no-repeat center center fixed;
 	background-size: cover;
+	background-color: #111111;
+}
+
+li button {
+
+	margin-right: 10px;
 }
 
 .floatRight {
@@ -26,6 +32,7 @@ html {
 	background-color: #5c1887;
 	opacity: 0.90;
 	width: 100%;
+	height: 100%
 	text-align: center;
 }
 

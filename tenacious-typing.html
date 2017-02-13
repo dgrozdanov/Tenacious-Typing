@@ -7,48 +7,305 @@
     <meta name = "description" content = "A fun way to get better at typing!">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
     <link rel = "stylesheet" href = "tenacious-typing.css">
-    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src = "../nav-bar.js"></script>
+    <link rel = "stylesheet" href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src = "tenacious-typing.js"></script>
     <script type = "text/javascript" src = "../node_modules/artyom.js/src/artyom.min.js"></script>
     <script src = "https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.1/howler.js"></script>
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBQPqOMwkOwBF2pK2t1xLfkxh1SXQiUMyk",
+        authDomain: "tenacious-typing.firebaseapp.com",
+        databaseURL: "https://tenacious-typing.firebaseio.com",
+        storageBucket: "tenacious-typing.appspot.com",
+        messagingSenderId: "145496713404"
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css" />
+    <script type="text/javascript">
+      // FirebaseUI config.
+      var uiConfig = {
+        signInSuccessUrl: 'tenacious-typing.html',
+        signInOptions: [
+          // Leave the lines as is for the providers you want to offer your users.
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+          //firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+          //firebase.auth.GithubAuthProvider.PROVIDER_ID,
+          firebase.auth.EmailAuthProvider.PROVIDER_ID
+        ],
+        // Terms of service url.
+        tosUrl: '<your-tos-url>'
+      };
+
+      // Initialize the FirebaseUI Widget using Firebase.
+      var ui = new firebaseui.auth.AuthUI(firebase.auth());
+      // The start method will wait until the DOM is loaded.
+      ui.start('#firebaseui-auth-container', uiConfig);
+    </script>
+
+    <!--************************************BEGIN TRACKER**********************-->
+
+    <script type="text/javascript">
+
+      //var database = Firebase.database();
+
+      initApp = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            var displayName = user.displayName;
+            var email = user.email;
+            var emailVerified = user.emailVerified;
+            var photoURL = user.photoURL;
+            var uid = user.uid;
+            var providerData = user.providerData;
+
+            /*function writeUserData(userId, name, email, imageUrl) {
+              firebase.database().ref('users/' + userId).set({
+                username: displayName,
+                email: email,
+                profile_picture : photoUrl,
+                uid: uid
+              });
+            }*/
+
+            firebase.database().ref('/users').set({
+              name: displayName,
+              email: email,
+              uid: uid
+            });
+
+            /*$.post('loginInfo.php', {variable: displayName});
+            $.post('loginInfo.php', {variable: email});
+            $.post('loginInfo.php', {variable: uid});*/
+
+            $('#loginDescription').html("<span class = 'glyphicon glyphicon-user'></span> Welcome, " + displayName + "!");
+
+            user.getToken().then(function(accessToken) {
+              /*document.getElementById('sign-in-status').textContent = 'Signed in';
+              document.getElementById('sign-in').textContent = 'Sign out';
+              document.getElementById('account-details').textContent = JSON.stringify({
+                displayName: displayName,
+                email: email,
+                emailVerified: emailVerified,
+                photoURL: photoURL,
+                uid: uid,
+                accessToken: accessToken,
+                providerData: providerData
+              }, null, '  ');*/
+            });
+          } else {
+            // User is signed out.
+            /*document.getElementById('sign-in-status').textContent = 'Signed out';
+            document.getElementById('sign-in').textContent = 'Sign in';
+            document.getElementById('account-details').textContent = 'null';*/
+          }
+        }, function(error) {
+          console.log(error);
+        });
+      };
+
+      window.addEventListener('load', function() {
+        initApp()
+      });
+    </script>
+
   </head>
 
   <body onload = "launchGame()">
 
-    <ul class = "navbar" id = "topNavBar">
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
 
-        <li><img src = "/maze-day/media/maze-day.ico" id = "navImage" alt = "Logo"></li>
-        <li> <a class = "active" href = "../maze-day.html">Return to Maze Day</a></li>
-        <li> <a href= "mailto:dmitri@cs.unc.edu"> Email Us</a></li>
-        <div class = "floatRight">
-          <li><a onclick = "skipQuestion()">Skip Question</a></li>
-          <li><a onclick = "muteMusic()">Toggle Music</a></li>
-          <li><a onclick = "resetGame()">Reset Game</a></li>
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+
+          <a class = "navbar-brand"> Tenacious Typing</a>
         </div>
-        <!--<li><input id = "mobileKey" name = "mobileKey" type = "text" placeholder = "open mobile keyboard"></li>-->
-        <li class = "icon"> <a href = "javascript:void(0);"
-          style = "font-size: 15px;" onclick = "scalableNav()">=</a></li>
-    </ul>
-    <br>
+
+        <div class = "collapse navbar-collapse" id = "myNavbar">
+          <ul class = "nav navbar-nav">
+            <!--<li><img src = "/maze-day/media/maze-day.ico" id = "navImage" alt = "Logo"></li>-->
+            <!--li class="active"><a href="#"><span class="glyphicon glyphicon-home"></span> Home</a></li-->
+            <li> <a class = "active" href = "../maze-day.html"><span class="glyphicon glyphicon-arrow-left"></span> Maze Day</a></li>
+            <li class = "dropdown">
+              <a class = "dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list"></span> Maze Day Games<span class="caret"></span></a>
+              <ul class = "dropdown-menu">
+                <li><a href = "../maze-day/tenacious-typing.html"> Tenacious Typing</a></li>
+                <li><a href = "../maze-day/track-simulator.html"> Track Simulator</a></li>
+                <li><a href = "../maze-day/awesome-archery.html"> Awesome Archery</a></li>
+              </ul>
+            </li>
+
+            <li class = "dropdown">
+              <a class = "dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list"></span> View<span class="caret"></span></a>
+              <ul class = "dropdown-menu">
+                <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#suggestionsModal"><span class="glyphicon glyphicon-pencil"></span> Submit Prompts</button></li>
+                <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#commentModal"><span class="glyphicon glyphicon-comment"></span> Leave a Comment</button></li>
+                <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#highScoreModal"><span class="glyphicon glyphicon-stats"></span> High Scores</button></li>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class = "nav navbar-nav navbar-right">
+            <li><button class = "btn btn-danger navbar-btn" id = "skipButton"><span class="glyphicon glyphicon-fast-forward"></span> Skip Question</button></li>
+            <li><button class = "btn btn-danger navbar-btn" id = "muteButton"><span class="glyphicon glyphicon-volume-off"></span> Toggle Music</button></li>
+            <li><button class = "btn btn-danger navbar-btn" id = "resetButton"><span class="glyphicon glyphicon-repeat"></span> Reset Game</button></li>
+            <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#loginModal"><div id = "loginDescription"><span class="glyphicon glyphicon-log-in"></span> Login</div></button></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Modals -->
+    <div class = "modal fade" id = "loginModal" role = "dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Login</h4>
+          </div>
+
+          <div class="modal-body">
+            <div id = "firebaseui-auth-container"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class = "modal fade" id = "highScoreModal" role = "dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">High Scores</h4>
+          </div>
+
+          <div class="modal-body">
+            <!--table-->
+            How high of a score can you earn?<br>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class = "modal fade" id="commentModal" role="dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class = "close" data-dismiss = "modal">&times;</button>
+            <h4 class = "modal-title">Comment Box</h4>
+          </div>
+
+          <div id = "commentDiv" class="modal-body">
+            <form action = "user-comment.php" method = "post">
+              What's your name?<br>
+              <input name = "name" type = "text">
+              <br><br>
+              How do you rate this game?<br>
+              <div id = "ratingDiv">
+                <a href="#oneStar">
+                  <span class="glyphicon glyphicon-star"></span>
+                </a>
+                <a href="#twoStars">
+                  <span class="glyphicon glyphicon-star"></span>
+                </a>
+                <a href="#threeStars">
+                  <span class="glyphicon glyphicon-star"></span>
+                </a>
+                <a href="#fourStars">
+                  <span class="glyphicon glyphicon-star"></span>
+                </a>
+                <a href="#fiveStars">
+                  <span class="glyphicon glyphicon-star"></span>
+                </a>
+            </div>
+              <br><br>
+              What's your comment?<br>
+              <input name = "comment" type = "text">
+              <br><br>
+              <input type = "submit" value = "Submit">
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class = "modal fade" id="suggestionsModal" role="dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class = "close" data-dismiss = "modal">&times;</button>
+            <h4 class = "modal-title">Submit Prompts</h4>
+          </div>
+
+          <div class="modal-body">
+            <a href="#">
+              <span class="glyphicon glyphicon-star"></span>
+            </a>
+            <a href="#">
+              <span class="glyphicon glyphicon-star"></span>
+            </a>
+            <a href="#">
+              <span class="glyphicon glyphicon-star"></span>
+            </a>
+            <a href="#">
+              <span class="glyphicon glyphicon-star"></span>
+            </a>
+            <a href="#">
+              <span class="glyphicon glyphicon-star"></span>
+            </a>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
 
     <div id = "divLaunchGame">
-
       <div id = "splashScreen">
-
-        <br><br>
-        <h2>Loading...</h2>
-        <img src = "/maze-day/media/splash-screen.png" id = "splashImage" alt = "Maze Day">
+        <!--h2>Loading...</h2-->
+        <!--img src = "/maze-day/media/splash-screen.png" id = "splashImage" alt = "Maze Day"-->
         <!--a href="#" class="enter_link">Play</a-->
       </div>
-
     </div>
 
     <footer>
-
-      Created by geeks making the world a bit better.
-
+      Created by geeks making the world a bit better. Powered by Artyom.js speech recognition.
     </footer>
-
   </body>
 </html>

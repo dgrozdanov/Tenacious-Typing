@@ -46,12 +46,34 @@ var superFont = (deviceWidth/1920 * 200);//As a ratio of 200px font on 1920 scre
 var canvasWidth = deviceWidth;//100% of screen width
 var canvasHeight = deviceHeight*.6;//75% of screen height
 
+/*var firebase = require('firebase');
+var firebaseui = require('firebaseui');
+
+var provider = new firebase.auth.GoogleAuthProvider();*/
+
 function launchGame() {
 
-	document.getElementById("splashImage").width = deviceWidth*.98;
-	document.getElementById("splashImage").height = deviceHeight*.8;
-	document.getElementById("navImage").width = deviceWidth*.05;
-	document.getElementById("navImage").height = deviceHeight*.05;
+	/*firebase.auth().signInWithPopup(provider).then(function(result) {
+	  // This gives you a Google Access Token. You can use it to access the Google API.
+	  var token = result.credential.accessToken;
+	  // The signed-in user info.
+	  var user = result.user;
+	  // ...
+	}).catch(function(error) {
+	  // Handle Errors here.
+	  var errorCode = error.code;
+	  var errorMessage = error.message;
+	  // The email of the user's account used.
+	  var email = error.email;
+	  // The firebase.auth.AuthCredential type that was used.
+	  var credential = error.credential;
+	  // ...
+	});*/
+
+	//document.getElementById("splashImage").width = deviceWidth*.98;
+	//document.getElementById("splashImage").height = deviceHeight*.8;
+	//document.getElementById("navImage").width = deviceWidth*.05;
+	//document.getElementById("navImage").height = deviceHeight*.05;
 
 	word = new Array();
 	//Variables initialized to default values
@@ -77,6 +99,36 @@ function launchGame() {
 	utterance.rate = 3;
 	utterance.volume = 1;
 
+	$('#loginButton').on('click', function (event) {
+		signInWithPopup();
+	});
+
+	$('#skipButton').on('click', function(event) {
+		skipQuestion();
+	});
+
+	$('#muteButton').on('click', function(event) {
+		muteMusic();
+	});
+
+	$('#resetButton').on('click', function(event) {
+		resetGame();
+	});
+
+	$('form').on('submit', function (e) {
+
+		e.preventDefault();//Prevents the webpage from reloading
+
+		$.ajax({
+			type: 'POST',
+			url: 'user-comment.php',//PHP form validation link
+			data: $('form').serialize(),
+			success: function () {
+				alert('You have successfully submitted your comment!');//If PHP form successfully submitted, this alert statement will execute
+			}
+		});
+	});
+
 	//Sequence of commands to launch voice command software and listen for key words
 	artyom.initialize({
 
@@ -85,26 +137,41 @@ function launchGame() {
 		debug:false,
 		listen:true
 	});
-
+/*
 	artyom.addCommands({
+		{
+			indexes:["New York","Big Apple","NYC"],
+			action: function(i) {
 
-		indexes:["New York"],
-		action: function(i) {
+					artyom.say("I love New York");
+			}
+		}
+		{
+			indexes:["Boston"],
+			action: function(i) {
 
-				artyom.say("I love New York");
-		},
-		indexes:["Boston"],
-		action: function(i) {
+					artyom.say("I love Boston");
+			}
+		}
+		{
+			indexes:["Houston"],
+			action: function(i) {
 
-				artyom.say("I love Boston");
-		},
-		indexes:["Houston"],
-		action: function(i) {
-
-				artyom.say("I love Houston");
+					artyom.say("I love Houston");
+			}
 		}
 	});
+*/
 
+artyom.addCommands({
+
+	indexes:["Microphone"],
+	action: function(i) {
+
+			hasMic = true;
+			artyom.say("Voice recognition mode selected");
+	}
+});
 
 	artyom.addCommands({
 
@@ -777,6 +844,8 @@ var gameMap = {
 
 		this.canvas.width = canvasWidth;
 		this.canvas.height = canvasHeight*.6;
+
+		//alert("height: " + canvasWidth + " height: " + canvasHeight);
 		this.context = this.canvas.getContext("2d");
 		div.appendChild(this.canvas);
 		//this.interval = setInterval(updateGameMap, 500);
@@ -796,7 +865,7 @@ function updateGameMap() {
 	deviceHeight = (window.innerHeight > 0) ? window.innerHeight : screen.height;
 
 	gameMap.canvas.width = deviceWidth;
-	gameMap.canvas.height = deviceHeight;//60% of screen height
+	gameMap.canvas.height = deviceHeight;
 
 	ctx = gameMap.context;
 	ctx.fillStyle = "white";
