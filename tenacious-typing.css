@@ -1,33 +1,78 @@
 html {
-
 	background: url(/maze-day/media/logo.png) no-repeat center center fixed;
 	background-size: cover;
 	background-color: #111111;
 }
 
 li button {
-
 	margin-right: 10px;
 }
 
 .floatRight {
-
 	float: right;
 }
 
 .center {
-
 	float: none;
 	text-align: center;
 }
 
 .huge {
-
 	font-size: 200%;
 }
 
-#divLaunchGame {
+/* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    bottom: 30px; /* 30px from the bottom */
+}
 
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+    visibility: visible; /* Show the snackbar */
+
+/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+However, delay the fade out process for 2.5 seconds */
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+#commentList {
+	overflow: scroll;
+}
+
+#divLaunchGame {
 	color: #ffffff;
 	background-color: #5c1887;
 	opacity: 0.90;
@@ -36,93 +81,7 @@ li button {
 	text-align: center;
 }
 
-ul.navbar {
-
-	position: fixed;
-	z-index: 5;
-  list-style-type: none;
-	max-height: 7%;
-	width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #007bbc;
-}
-
-ul.navbar #mobileKey {
-
-	float: right;
-}
-
-ul.navbar li {
-
-	float: left;
-}
-
-ul.navbar li a {
-
-	display: inline-block;
-  color: #ffffff;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  transition: 0.3s;
-  font-size: 16px;
-}
-
-ul.navbar li a:hover {
-
-	background-color: #111111;
-}
-
-ul.navbar li.icon {
-
-	display: none;
-}
-
-@media screen and (max-width:680px) {
-
-  ul.navbar li:not(:first-child) {
-
-		display: none;
-	}
-
-  ul.navbar li.icon {
-
-		float: right;
-    display: inline-block;
-  }
-}
-
-@media screen and (max-width:680px) {
-
-  ul.navbar.responsive {
-
-		position: relative;
-	}
-
-  ul.navbar.responsive li.icon {
-
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-
-  ul.navbar.responsive li {
-
-    float: none;
-    display: inline;
-  }
-
-  ul.navbar.responsive li a {
-
-		display: block;
-    text-align: left;
-  }
-}
-
 footer {
-
 	position: fixed;
 	bottom: 0;
 	width: 100%;
@@ -133,7 +92,6 @@ footer {
 }
 
 body {
-
 	width: 100%;
 	height: 100%;
 	margin: 0px;

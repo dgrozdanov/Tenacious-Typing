@@ -3,9 +3,13 @@
 //Add game component to this - maybe telling a story from Tarheel Reader and pick random words to spell
 //Give ability to spell out a word
 //Make a voice menu of possible commands
-//Add PHP/SQL comment system and word speakPoints
 //Rewrite in React
 
+//Pixi.js canvas elemnents
+var app;
+var style;
+//database
+var db;
 //Music
 var backgroundMusic;
 //Array
@@ -46,6 +50,142 @@ var superFont = (deviceWidth/1920 * 200);//As a ratio of 200px font on 1920 scre
 var canvasWidth = deviceWidth;//100% of screen width
 var canvasHeight = deviceHeight*.6;//75% of screen height
 
+function displaySnackbar() {
+    // Get the snackbar DIV
+    var x = document.getElementById("snackbar")
+
+    // Add the "show" class to DIV
+    x.className = "show";
+
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
+// Initialize Firebase
+var config = {
+	apiKey: "AIzaSyBQPqOMwkOwBF2pK2t1xLfkxh1SXQiUMyk",
+	authDomain: "tenacious-typing.firebaseapp.com",
+	databaseURL: "https://tenacious-typing.firebaseio.com",
+	storageBucket: "tenacious-typing.appspot.com",
+	messagingSenderId: "145496713404"
+};
+firebase.initializeApp(config);
+
+// FirebaseUI config.
+var uiConfig = {
+	signInSuccessUrl: 'tenacious-typing.html',
+	signInOptions: [
+		// Leave the lines as is for the providers you want to offer your users.
+		firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+		firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+		//firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+		//firebase.auth.GithubAuthProvider.PROVIDER_ID,
+		firebase.auth.EmailAuthProvider.PROVIDER_ID
+	],
+	// Terms of service url.
+	tosUrl: '<your-tos-url>'
+};
+
+// Initialize the FirebaseUI Widget using Firebase.
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
+// The start method will wait until the DOM is loaded.
+ui.start('#firebaseui-auth-container', uiConfig);
+
+//var database = Firebase.database();
+
+initApp = function() {
+	firebase.auth().onAuthStateChanged(function(user) {
+		if (user) {
+			// User is signed in.
+			var displayName = user.displayName;
+			var email = user.email;
+			var emailVerified = user.emailVerified;
+			var photoURL = user.photoURL;
+			var uid = user.uid;
+			var providerData = user.providerData;
+
+			/*function writeUserData(userId, name, email, imageUrl) {
+				firebase.database().ref('users/' + userId).set({
+					username: displayName,
+					email: email,
+					profile_picture : photoUrl,
+					uid: uid
+				});
+			}*/
+
+			db = firebase.database();
+
+			var postsRef = db.ref().child("users");
+
+			/*var newPostRef = postsRef.push();
+			newPostRef.set({
+				uDisplayName: displayName,
+				uEmail: email,
+				uEmailVerified: emailVerified,
+				uPhotoURL: photoURL,
+				uUID: uid,
+				uProviderData: providerData
+			});*/
+
+			// we can also chain the two calls together
+			postsRef.push().set({
+				uDisplayName: displayName,
+				uEmail: email,
+				uEmailVerified: emailVerified,
+				uPhotoURL: photoURL,
+				uUID: uid,
+				uProviderData: providerData
+			});
+
+			/*firebase.database().ref('/users').set({
+				"name": displayName,
+				"email": email,
+				"uid": uid
+			});*/
+
+			/*$.post('loginInfo.php', {variable: displayName});
+			$.post('loginInfo.php', {variable: email});
+			$.post('loginInfo.php', {variable: uid});*/
+
+			$('#loginDescription').html("<span class = 'glyphicon glyphicon-user'></span> Welcome, " + displayName + "!");
+
+			user.getToken().then(function(accessToken) {
+				/*document.getElementById('sign-in-status').textContent = 'Signed in';
+				document.getElementById('sign-in').textContent = 'Sign out';
+				document.getElementById('account-details').textContent = JSON.stringify({
+					displayName: displayName,
+					email: email,
+					emailVerified: emailVerified,
+					photoURL: photoURL,
+					uid: uid,
+					accessToken: accessToken,
+					providerData: providerData
+				}, null, '  ');*/
+			});
+		} else {
+			// User is signed out.
+			/*document.getElementById('sign-in-status').textContent = 'Signed out';
+			document.getElementById('sign-in').textContent = 'Sign in';
+			document.getElementById('account-details').textContent = 'null';*/
+		}
+	}, function(error) {
+		console.log(error);
+	});
+};
+
+window.addEventListener('load', function() {
+	initApp()
+});
+
+$('#signOutButton').on('click', function(event) {
+	firebase.auth().signOut().then(function() {
+		console.log('Signed Out');
+	}, function(error) {
+		console.error('Sign Out Error', error);
+	});
+});
+$('#loginDescription').html("<span class='glyphicon glyphicon-log-in'></span> Login");
+
 /*var firebase = require('firebase');
 var firebaseui = require('firebaseui');
 
@@ -74,7 +214,7 @@ function launchGame() {
 	//document.getElementById("splashImage").height = deviceHeight*.8;
 	//document.getElementById("navImage").width = deviceWidth*.05;
 	//document.getElementById("navImage").height = deviceHeight*.05;
-
+	db = firebase.database();
 	word = new Array();
 	//Variables initialized to default values
 	prompt = ["maze", "day", "fun"];
@@ -265,6 +405,48 @@ artyom.addCommands({
 
 	artyom.say("Loading");
 
+	//*************************************PIXI**************************
+
+	app = new PIXI.Application(deviceWidth, deviceHeight*0.88, {backgroundColor : 0x1099bb});
+	document.body.appendChild(app.view);
+
+	style = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 36,
+    fontStyle: 'italic',
+    fontWeight: 'bold',
+    fill: ['#ffffff', '#00ff99'], // gradient
+    stroke: '#4a1850',
+    strokeThickness: 5,
+    dropShadow: true,
+    dropShadowColor: '#000000',
+    dropShadowBlur: 4,
+    dropShadowAngle: Math.PI / 6,
+    dropShadowDistance: 6,
+    wordWrap: true,
+    wordWrapWidth: 600
+	});
+
+	// create a new Sprite from an image path
+	var logo = PIXI.Sprite.fromImage('../maze-day/media/logo-borderless.png');
+
+	// center the sprite's anchor point
+	logo.anchor.set(0.5);
+
+	// move the sprite to the center of the screen
+	logo.x = app.renderer.width / 2;
+	logo.y = app.renderer.height / 2;
+
+	app.stage.addChild(logo);
+
+	// Listen for animate update
+	app.ticker.add(function(delta) {
+			// just for fun, let's rotate mr rabbit a little
+			// delta is 1 if running at 100% performance
+			// creates frame-independent tranformation
+			logo.rotation += 0.1 / delta;
+	});
+
 	//Background music played on loop with queue for other game sounds
 	backgroundMusic = new Howl({
 
@@ -276,10 +458,243 @@ artyom.addCommands({
 			//Game canvas loaded, launching the game
 			$('#splashScreen').fadeOut(10);
 
+			app.stage.removeChild(logo);
+
+			var gameText = new PIXI.Text('Welcome to Tenacious Typing!', style);
+			gameText.x = canvasWidth/2;
+			gameText.y = canvasHeight/2;
+			//app.stage.addChild(gameText);
+
+			//****************************
+
+			// // Load them google fonts before starting...!
+			window.WebFontConfig = {
+			    google: {
+			        families: ['Snippet', 'Arvo:700italic', 'Podkova:700']
+			    },
+
+			    active: function() {
+			        // do something
+			        init();
+			    }
+			};
+
+			// include the web-font loader script
+			/* jshint ignore:start */
+			(function() {
+			    var wf = document.createElement('script');
+			    wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+			        '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+			    wf.type = 'text/javascript';
+			    wf.async = 'true';
+			    var s = document.getElementsByTagName('script')[0];
+			    s.parentNode.insertBefore(wf, s);
+			})();
+			/* jshint ignore:end */
+
+			function init()
+			{
+			    PIXI.loader
+			        //.add('desyrel', 'required/assets/desyrel.xml')
+			        .load(onAssetsLoaded);
+
+			    function onAssetsLoaded() {
+			        var bitmapFontText = new PIXI.extras.BitmapText('bitmap fonts are\n now supported!', { font: '35px Desyrel', align: 'right' });
+
+			        bitmapFontText.x = app.renderer.width - bitmapFontText.textWidth - 20;
+			        bitmapFontText.y = 20;
+
+			        app.stage.addChild(bitmapFontText);
+			    }
+
+			    // add a shiny background...
+			    var background = PIXI.Sprite.fromImage('../maze-day/media/backgroundPic.jpg');
+			    background.width = app.renderer.width;
+			    background.height = app.renderer.height;
+			    app.stage.addChild(background);
+
+			    // create a text object with a nice stroke
+			    var spinningText = new PIXI.Text('Welcome to Tenacious Typing!', {
+			        fontWeight: 'bold',
+			        fontFamily: 'Arial',
+							fontSize: 60,
+			        fill: '#cc00ff',
+			        align: 'center',
+			        stroke: '#FFFFFF',
+			        strokeThickness: 6
+			    });
+
+			    // create a text object that will be updated...
+			    var countingText = new PIXI.Text('Score: 0', {
+						fontWeight: 'bold',
+						fontFamily: 'Snippet',
+						fontSize: 35,
+						fill: '#cc00ff',
+						align: 'left',
+						stroke: '#FFFFFF',
+						strokeThickness: 6
+			    });
+
+					var firstText = new PIXI.Text('Select your game mode:', {
+						fontWeight: 'bold',
+						fontFamily: 'Snippet',
+						fontSize: 35,
+						fill: '#cc00ff',
+						align: 'left',
+						stroke: '#FFFFFF',
+						strokeThickness: 6
+			    });
+					var secondText = new PIXI.Text('Spelling Mode', {
+						fontWeight: 'bold',
+						fontFamily: 'Snippet',
+						fontSize: 35,
+						fill: '#cc00ff',
+						align: 'left',
+						stroke: '#FFFFFF',
+						strokeThickness: 6
+			    });
+					var thirdText = new PIXI.Text('Press enter to begin!', {
+						fontWeight: 'bold',
+						fontFamily: 'Snippet',
+						fontSize: 35,
+						fill: '#cc00ff',
+						align: 'left',
+						stroke: '#FFFFFF',
+						strokeThickness: 6
+			    });
+
+					// setting the anchor point to 0.5 will center align the text... great for spinning!
+			    spinningText.anchor.set(0.5);
+			    spinningText.x = app.renderer.width / 2;
+			    spinningText.y = app.renderer.height / 2 * .5;
+
+					countingText.position.set(20);
+
+					firstText.anchor.set(0.5);
+			    firstText.x = app.renderer.width / 2;
+			    firstText.y = app.renderer.height / 2;
+
+					secondText.anchor.set(0.5);
+			    secondText.x = app.renderer.width / 2;
+			    secondText.y = app.renderer.height / 2 * 1.25;
+
+					thirdText.anchor.set(0.5);
+			    thirdText.x = app.renderer.width / 2;
+			    thirdText.y = app.renderer.height / 2 * 1.5;
+
+					app.stage.addChild(spinningText, countingText, firstText, secondText, thirdText);
+
+			    app.ticker.add(function() {
+
+			        // update the text with a new string
+			        countingText.text = 'Score: ' + points;
+
+							//spinningText.fontSize += 1;
+
+			        // let's spin the spinning text
+			        //spinningText.rotation += 0.03;
+
+
+							/*if (choosingMode) {
+
+								spinningText = "Welcome to Tenacious Typing!";
+
+
+								ctx.fillText("Select your game mode:", canvasWidth/2, canvasHeight/2);
+
+								if (optionInc == 0) {
+
+									ctx.fillText("Spelling", canvasWidth/2, canvasHeight/2 + 2*primaryFont);
+								}
+
+								else {
+
+									ctx.fillText("Guided", canvasWidth/2, canvasHeight/2 + 2*primaryFont);
+								}
+
+								ctx.fillText("Press enter to start!", canvasWidth/2, canvasHeight/2 + 5*primaryFont);
+							}
+
+							else if (gameOver) {
+
+								if (fontInc % 2 == 0) {
+
+									ctx.font = "bold " + mediumFont + "px Arial";
+								}
+
+								else if (fontInc % 2 == 1) {
+
+									ctx.font = "bold " + primaryFont + "px Arial";
+								}
+
+								fontInc++;
+
+								ctx.fillText("Awesome, you win!", canvasWidth/2, canvasHeight/2 - 3*primaryFont);
+								ctx.font = primaryFont + "px Arial";
+								ctx.fillText("Wanna play again? Press enter!", canvasWidth/2, canvasHeight/2);
+							}
+
+							else {
+
+								ctx.font = superFont + "px Arial";
+
+								if (correct) {
+
+									text = "Good job!";
+								}
+
+								else {
+
+									instruction = "Your word is";
+									text = "\"" + getPrompt() + "\"";
+								}
+
+								ctx.fillText(instruction, canvasWidth/2, canvasHeight/2);
+								ctx.fillText(text, canvasWidth/2, canvasHeight/2 + superFont);
+
+								if (incorrect) {
+
+									ctx.fillStyle = "red";
+									ctx.fillText("try again", canvasWidth/2, canvasHeight/2 + superFont*2);
+								}
+
+								if (spellingErrorAt != null) {
+
+									var correctPart = word.join("").substring(0, spellingErrorAt);
+
+									ctx.fillStyle = "green";
+									ctx.fillText(correctPart, canvasWidth/2, canvasHeight/2 + superFont*2);
+
+									var incorrectPartOffset = ctx.measureText(correctPart).width;
+
+									var incorrectPart = word.join("").substring(spellingErrorAt, word.join("").length);
+
+									ctx.textAlign = "left";
+
+									ctx.fillStyle = "red";
+									ctx.fillText(incorrectPart, canvasWidth/2 + incorrectPartOffset, canvasHeight/2 + superFont*2);
+								}
+
+								else {
+
+									ctx.fillStyle = "green";
+									ctx.fillText(word.join(""), canvasWidth/2, canvasHeight/2 + superFont*1.5);
+								}
+
+								ctx.font = largeFont + "px Arial";
+								ctx.fillStyle = "white";
+								ctx.textAlign = "left";
+								ctx.fillText("Score: " + points + "/30", canvasWidth*.03, canvasHeight*.14);
+							}*/
+			    });
+			}
+
+			//****************************
+
 
 			loaded = true;
-			gameMap.start();
-			updateGameMap();
+			//gameMap.start();
+			//updateGameMap();
 			playWelcome();
 		},
 		onplay: function() {
@@ -349,7 +764,7 @@ function playWelcome() {
 
 	sound.play();
 
-	artyom.say("Do you have a microphone? Say microphone if you do, or press enter if you don't.");
+	//artyom.say("Do you have a microphone? Say yeah if you do, or press enter if you don't.");
 
 
 
@@ -403,19 +818,19 @@ function nextPrompt() {
 
 	if (getPoints() >= (prompt.length * 10)) {
 
-		return winGame();
+		//return winGame();
 	}
 
 	promptInc++;
 
 	if (promptInc == prompt.length) {
 
-		return winGame();
+		//return winGame();
 	}
 
 	playPrompt();
 
-	return updateGameMap();
+	//return updateGameMap();
 }
 
 function getPrompt() {
@@ -474,7 +889,7 @@ function checkAnswer() {
 
 	if (wrongInc == 5) {
 
-		var utteranceStatus = new SpeechSynthesisUtterance("To skip this question, say skip question.");
+		var utteranceStatus = new SpeechSynthesisUtterance("Remember: you can skip this question by saying skip.");
 		window.speechSynthesis.speak(utteranceStatus);
 	}
 
@@ -490,7 +905,7 @@ function winGame() {
 	gameOver = true;
 	updateGameMap();
 
-	utteranceWin = new SpeechSynthesisUtterance("Awesome, you win! Press the backspace key to play again.");
+	utteranceWin = new SpeechSynthesisUtterance("Awesome, you win! Press or say enter to play again.");
 	window.speechSynthesis.speak(utteranceWin);
 }
 
@@ -498,7 +913,6 @@ function resetGame() {
 
 		backgroundMusic.stop();
 		launchGame();
-		//location.reload();
 }
 
 window.onkeydown = function(e) {
@@ -762,7 +1176,7 @@ window.onkeydown = function(e) {
 
 	else if (letter.length == 0) {
 
-		letter = "try again";
+		letter = "";
 	}
 
 	if (letter != "") {
@@ -833,152 +1247,4 @@ function wordMaker(newLetter) {
 window.onkeyup = function() {
 
 	keyPressed = false;
-}
-
-var gameMap = {
-
-	canvas : document.createElement("canvas"),
-	start : function() {
-
-		var div = document.getElementById("divLaunchGame");
-
-		this.canvas.width = canvasWidth;
-		this.canvas.height = canvasHeight*.6;
-
-		//alert("height: " + canvasWidth + " height: " + canvasHeight);
-		this.context = this.canvas.getContext("2d");
-		div.appendChild(this.canvas);
-		//this.interval = setInterval(updateGameMap, 500);
-	},
-
-	clear : function() {
-
-		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	}
-}
-
-function updateGameMap() {
-
-	gameMap.clear();
-
-	deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-	deviceHeight = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-
-	gameMap.canvas.width = deviceWidth;
-	gameMap.canvas.height = deviceHeight;
-
-	ctx = gameMap.context;
-	ctx.fillStyle = "white";
-	ctx.font = primaryFont + "px Arial";
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-
-	var instruction = "";
-
-	if (choosingMode) {
-
-		//document.getElementById("divLaunchGame").style.background = 'yellow';
-
-		if (fontInc % 2 == 0) {
-
-			ctx.font = "bold " + mediumFont + "px Arial";
-		}
-
-		else if (fontInc % 2 == 1) {
-
-			ctx.font = "bold " + primaryFont + "px Arial";
-		}
-
-		fontInc++;
-
-		ctx.fillText("Welcome to Tenacious Typing!", canvasWidth/2, canvasHeight/2 - 3*primaryFont);
-
-		ctx.font = primaryFont + "px Arial";
-
-		ctx.fillText("Select your game mode:", canvasWidth/2, canvasHeight/2);
-
-		if (optionInc == 0) {
-
-			ctx.fillText("Spelling", canvasWidth/2, canvasHeight/2 + 2*primaryFont);
-		}
-
-		else {
-
-			ctx.fillText("Guided", canvasWidth/2, canvasHeight/2 + 2*primaryFont);
-		}
-
-		ctx.fillText("Press enter to start!", canvasWidth/2, canvasHeight/2 + 5*primaryFont);
-	}
-
-	else if (gameOver) {
-
-		if (fontInc % 2 == 0) {
-
-			ctx.font = "bold " + mediumFont + "px Arial";
-		}
-
-		else if (fontInc % 2 == 1) {
-
-			ctx.font = "bold " + primaryFont + "px Arial";
-		}
-
-		fontInc++;
-
-		ctx.fillText("Awesome, you win!", canvasWidth/2, canvasHeight/2 - 3*primaryFont);
-		ctx.font = primaryFont + "px Arial";
-		ctx.fillText("Wanna play again? Press enter!", canvasWidth/2, canvasHeight/2);
-	}
-
-	else {
-
-		ctx.font = superFont + "px Arial";
-
-		if (correct) {
-
-			text = "Good job!";
-		}
-
-		else {
-
-			instruction = "Your word is";
-			text = "\"" + getPrompt() + "\"";
-		}
-
-		ctx.fillText(instruction, canvasWidth/2, canvasHeight/2);
-		ctx.fillText(text, canvasWidth/2, canvasHeight/2 + superFont);
-
-		if (incorrect) {
-
-			ctx.fillStyle = "red";
-			ctx.fillText("try again", canvasWidth/2, canvasHeight/2 + superFont*2);
-		}
-
-		if (spellingErrorAt != null) {
-
-			var correctPart = word.join("").substring(0, spellingErrorAt);
-
-			ctx.fillStyle = "green";
-			ctx.fillText(correctPart, canvasWidth/2, canvasHeight/2 + superFont*2);
-
-			var incorrectPartOffset = ctx.measureText(correctPart).width;
-
-			var incorrectPart = word.join("").substring(spellingErrorAt, word.join("").length);
-
-			ctx.textAlign = "left";
-
-			ctx.fillStyle = "red";
-			ctx.fillText(incorrectPart, canvasWidth/2 + incorrectPartOffset, canvasHeight/2 + superFont*2);
-		}
-
-		else {
-
-			ctx.fillStyle = "green";
-			ctx.fillText(word.join(""), canvasWidth/2, canvasHeight/2 + superFont*1.5);
-		}
-
-		ctx.font = largeFont + "px Arial";
-		ctx.fillStyle = "white";
-		ctx.textAlign = "left";
-		ctx.fillText("Score: " + points + "/30", canvasWidth*.03, canvasHeight*.14);
-	}
 }
