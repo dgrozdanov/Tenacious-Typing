@@ -14,7 +14,7 @@
     <title>Tenacious Typing</title>
     <meta name = "description" content = "A fun way to get better at typing!">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+    <link rel = "stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
     <link rel = "stylesheet" href = "tenacious-typing.css">
     <link rel = "stylesheet" href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
@@ -57,7 +57,7 @@
               </ul>
             </li>
 
-            <li class = "dropdown">
+            <li class = "dropdown" onselect = "alertFunction()">
               <a class = "dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list"></span> View<span class="caret"></span></a>
               <ul class = "dropdown-menu">
                 <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#suggestionsModal"><span class="glyphicon glyphicon-pencil"></span> Submit Prompts</button></li>
@@ -68,7 +68,7 @@
           </ul>
 
           <ul class = "nav navbar-nav navbar-right">
-            <li><button class = "btn btn-danger navbar-btn" id = "skipButton"><span class="glyphicon glyphicon-fast-forward"></span> Skip Question</button></li>
+            <li><button class = "btn btn-danger navbar-btn" id = "skipButton" onselect = "alertFunction()"><span class="glyphicon glyphicon-fast-forward"></span> Skip Question</button></li>
             <li><button class = "btn btn-danger navbar-btn" id = "muteButton"><span class="glyphicon glyphicon-volume-off"></span> Toggle Music</button></li>
             <li><button class = "btn btn-danger navbar-btn" id = "resetButton"><span class="glyphicon glyphicon-repeat"></span> Reset Game</button></li>
             <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#loginModal"><div id = "loginDescription"><span class="glyphicon glyphicon-log-in"></span> Login</div></button></li>
@@ -76,6 +76,12 @@
         </div>
       </div>
     </nav>
+
+    <script>
+    alertFunction() {
+      alert("Tab triggered");
+    }
+    </script>
 
     <!-- Modals -->
     <div class = "modal fade" id = "loginModal" role = "dialog">
@@ -133,12 +139,12 @@
           </div>
 
           <div id = "commentDiv" class="modal-body">
-            What's your name?<br>
+            <legend>What's your name?</legend>
             <input id = "nameInput" name = "name" type = "text">
             <br><br>
 
-            <fieldset class="starability-growRotate.min.css">
-              <legend>First rating:</legend>
+            <fieldset class="accessible-stars.css">
+              <legend>How do you rate this game?</legend>
               <input type="radio" id="first-rate5" name="rating" value="5" />
               <label for="first-rate5" title="Amazing">5 stars</label>
               <input type="radio" id="first-rate4" name="rating" value="4" />
@@ -152,7 +158,7 @@
             </fieldset>
 
             <br><br>
-            What's your comment?<br>
+            <legend>What's your comment?</legend>
             <input id = "commentInput" name = "comment" type = "text">
             <br><br>
             <button class = "btn btn-danger navbar-btn" id = "submitComment"> Submit</button>
@@ -244,7 +250,7 @@
     </div>
 
     <div id = "divLaunchGame">
-      <div id = "splashScreen">
+      <div id = "unsupportedBrowser">
 
       </div>
     </div>
