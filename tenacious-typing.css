@@ -20,6 +20,33 @@ li button {
 	font-size: 200%;
 }
 
+.rate {
+  display: inline-block;
+}
+
+.rate:not(:checked) > input {
+  position: absolute;
+  top: -9999px;
+}
+
+.rate:not(:checked) > label {
+  float: right;
+  width: 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 30px;
+  color: #ccc;
+}
+
+.rate:not(:checked) > label:before { content: '★ '; }
+
+.rate > input:checked ~ label { color: #ffc700; }
+
+.rate:not(:checked) > label:hover, .rate:not(:checked) > label:hover ~ label { color: #deb217; }
+
+.rate > input:checked + label:hover, .rate > input:checked + label:hover ~ label, .rate > input:checked ~ label:hover, .rate > input:checked ~ label:hover ~ label, .rate > label:hover ~ input:checked ~ label { color: #c59b08; }
+
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */
@@ -67,17 +94,20 @@ However, delay the fade out process for 2.5 seconds */
     to {bottom: 0; opacity: 0;}
 }
 
+.navbar-default {
+    background-color: #0f006f;
+    border-color: #030033;
+		height: 20%;
+}
+
 #commentList {
-	overflow: scroll;
+	height: 250px;
+	overflow: auto;
 }
 
 #divLaunchGame {
-	color: #ffffff;
-	background-color: #5c1887;
-	opacity: 0.90;
-	width: 100%;
-	height: 100%
-	text-align: center;
+	padding-top:2%;
+	color: #fff;
 }
 
 footer {

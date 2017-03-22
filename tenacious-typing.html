@@ -14,7 +14,7 @@
     <title>Tenacious Typing</title>
     <meta name = "description" content = "A fun way to get better at typing!">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <link rel = "stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+    <script src="https://use.fontawesome.com/c87ebe651f.js"></script>
     <link rel = "stylesheet" href = "tenacious-typing.css">
     <link rel = "stylesheet" href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
@@ -29,59 +29,35 @@
     <script src = "tenacious-typing.js"></script>
   </head>
 
-  <body onload = "launchGame()">
-    <nav class="navbar navbar-inverse">
+  <body onload = "launchGame()" data-spy="scroll" data-target=".navbar" data-offset="50">
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
-
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
           </button>
-
-          <a class = "navbar-brand"> Tenacious Typing</a>
+          <a class="navbar-brand" href="http://www.mamaliga.me"><span class="glyphicon glyphicon-home"></span> mamaliga.me</a>
         </div>
-
-        <div class = "collapse navbar-collapse" id = "myNavbar">
-          <ul class = "nav navbar-nav">
-            <!--<li><img src = "/maze-day/media/maze-day.ico" id = "navImage" alt = "Logo"></li>-->
-            <!--li class="active"><a href="#"><span class="glyphicon glyphicon-home"></span> Home</a></li-->
-            <li> <a class = "active" href = "../maze-day.html"><span class="glyphicon glyphicon-arrow-left"></span> Maze Day</a></li>
-            <li class = "dropdown">
-              <a class = "dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list"></span> Maze Day Games<span class="caret"></span></a>
-              <ul class = "dropdown-menu">
-                <li><a href = "../maze-day/tenacious-typing.html"> Tenacious Typing</a></li>
-                <li><a href = "../maze-day/track-simulator.html"> Track Simulator</a></li>
-                <li><a href = "../maze-day/awesome-archery.html"> Awesome Archery</a></li>
-              </ul>
-            </li>
-
-            <li class = "dropdown" onselect = "alertFunction()">
-              <a class = "dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-list"></span> View<span class="caret"></span></a>
-              <ul class = "dropdown-menu">
-                <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#suggestionsModal"><span class="glyphicon glyphicon-pencil"></span> Submit Prompts</button></li>
-                <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#commentModal"><span class="glyphicon glyphicon-comment"></span> Leave a Comment</button></li>
-                <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#highScoreModal"><span class="glyphicon glyphicon-stats"></span> High Scores</button></li>
-              </ul>
-            </li>
-          </ul>
-
-          <ul class = "nav navbar-nav navbar-right">
-            <li><button class = "btn btn-danger navbar-btn" id = "skipButton" onselect = "alertFunction()"><span class="glyphicon glyphicon-fast-forward"></span> Skip Question</button></li>
-            <li><button class = "btn btn-danger navbar-btn" id = "muteButton"><span class="glyphicon glyphicon-volume-off"></span> Toggle Music</button></li>
-            <li><button class = "btn btn-danger navbar-btn" id = "resetButton"><span class="glyphicon glyphicon-repeat"></span> Reset Game</button></li>
-            <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#loginModal"><div id = "loginDescription"><span class="glyphicon glyphicon-log-in"></span> Login</div></button></li>
-          </ul>
+        <div>
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+              <li><button class = "btn btn-primary navbar-btn" id = "promptButton" data-toggle = "modal" data-target = "#suggestionsModal"><span class="glyphicon glyphicon-pencil"></span> Submit Prompts</button></li>
+              <li><button class = "btn btn-primary navbar-btn" id = "commentButton" data-toggle = "modal" data-target = "#commentModal"><span class="glyphicon glyphicon-comment"></span> Leave a Comment</button></li>
+              <li><button class = "btn btn-primary navbar-btn" id = "scoresButton" data-toggle = "modal" data-target = "#highScoreModal"><span class="glyphicon glyphicon-stats"></span> High Scores</button></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><button class = "btn btn-danger navbar-btn" id = "skipButton"><span class="glyphicon glyphicon-fast-forward"></span> Skip Question</button></li>
+              <li><button class = "btn btn-danger navbar-btn" id = "muteButton"><span class="glyphicon glyphicon-volume-off"></span> Toggle Music</button></li>
+              <li><button class = "btn btn-danger navbar-btn" id = "resetButton"><span class="glyphicon glyphicon-repeat"></span> Reset Game</button></li>
+              <li><button class = "btn btn-primary navbar-btn" data-toggle = "modal" data-target = "#loginModal"><div id = "loginDescription"><span class="glyphicon glyphicon-log-in"></span> Login</div></button></li>
+            </ul>
+          </div>
         </div>
       </div>
     </nav>
-
-    <script>
-    alertFunction() {
-      alert("Tab triggered");
-    }
-    </script>
 
     <!-- Modals -->
     <div class = "modal fade" id = "loginModal" role = "dialog">
@@ -94,12 +70,28 @@
           </div>
 
           <div class="modal-body">
+            <div id = "loggedInStatus">
+            </div>
             <div id = "firebaseui-auth-container"></div>
-
-            <button class = "btn btn-danger navbar-btn" id = "signOutButton"> Sign out</button>
           </div>
 
           <div class="modal-footer">
+            <button class = "btn btn-danger navbar-btn" id = "signOutButton"> Sign out</button>
+
+            <script>
+            $('#signOutButton').on('click', function(event) {
+            	firebase.auth().signOut().then(function() {
+            		$('#loginDescription').html("<span class='glyphicon glyphicon-log-in'></span> Login");
+                $('#loggedInStatus').html("");
+            		console.log('Signed Out');
+            	}, function(error) {
+            		console.error('Sign Out Error', error);
+            	});
+              $('#firebaseui-auth-container').show();
+              $('#signOutButton').hide();
+            });
+            </script>
+
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
 
@@ -118,7 +110,7 @@
 
           <div class="modal-body">
             <!--table-->
-            How high of a score can you earn?<br>
+            A list of our tenacious all-stars:<br>
           </div>
 
           <div class="modal-footer">
@@ -138,32 +130,44 @@
             <h4 class = "modal-title">Comment Box</h4>
           </div>
 
-          <div id = "commentDiv" class="modal-body">
-            <legend>What's your name?</legend>
-            <input id = "nameInput" name = "name" type = "text">
-            <br><br>
+          <div class = "modal-body row text-center">
+            <div class="col-sm-6">
+              <legend>What's your name?</legend>
+              <input id = "nameInput" name = "name" type = "text">
+              <br><br>
 
-            <fieldset class="accessible-stars.css">
               <legend>How do you rate this game?</legend>
-              <input type="radio" id="first-rate5" name="rating" value="5" />
-              <label for="first-rate5" title="Amazing">5 stars</label>
-              <input type="radio" id="first-rate4" name="rating" value="4" />
-              <label for="first-rate4" title="Very good">4 stars</label>
-              <input type="radio" id="first-rate3" name="rating" value="3" />
-              <label for="first-rate3" title="Average">3 stars</label>
-              <input type="radio" id="first-rate2" name="rating" value="2" />
-              <label for="first-rate2" title="Not good">2 stars</label>
-              <input type="radio" id="first-rate1" name="rating" value="1" />
-              <label for="first-rate1" title="Terrible">1 star</label>
-            </fieldset>
+              <div class="rate">
+                <input type="radio" id="star5" name="rate" value="5" />
+                <label for="star5" title="Awesome">5 stars</label>
+                <input type="radio" id="star4" name="rate" value="4" />
+                <label for="star4" title="Good">4 stars</label>
+                <input type="radio" id="star3" name="rate" value="3" />
+                <label for="star3" title="Aight">3 stars</label>
+                <input type="radio" id="star2" name="rate" value="2" />
+                <label for="star2" title="Meh">2 stars</label>
+                <input type="radio" id="star1" name="rate" value="1" />
+                <label for="star1" title="Bye Felicia">1 star</label>
+              </div>
 
-            <br><br>
-            <legend>What's your comment?</legend>
-            <input id = "commentInput" name = "comment" type = "text">
-            <br><br>
-            <button class = "btn btn-danger navbar-btn" id = "submitComment"> Submit</button>
+              <br><br>
+              <legend>What's your comment?</legend>
+              <input id = "commentInput" name = "comment" type = "text">
+              <br><br>
+              <button class = "btn btn-danger navbar-btn" id = "submitComment"> Submit</button>
 
-            <!-- The actual snackbar -->
+            </div>
+
+            <div class="col-sm-6" id = "commentDisplayDiv">
+                <legend>Comments:</legend>
+                <div id="commentList"></div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
             <div id="snackbar">Thanks for leaving your comment!</div>
 
             <script>
@@ -186,7 +190,7 @@
                 //uRating: rating,
                 uComment: xssFilters.inHTMLData(comment)
               });
-          	});
+            });
 
             db = firebase.database();
             var commentsRef = db.ref().child("comments");
@@ -195,19 +199,11 @@
             commentsRef.on("child_added", function(snapshot, prevChildKey) {
               var newPost = snapshot.val();
               //console.log("Previous Post ID: " + prevChildKey);
-              $('#commentList').append('<li>Name: ' + newPost.uName + /*'<br>Rating: ' + newPost.uRating +*/ '<br>Comment: ' + newPost.uComment + '</li>');
+              //$('#commentList').append('<li>Name: ' + newPost.uName + /*'<br>Rating: ' + newPost.uRating +*/ '<br>Comment: ' + newPost.uComment + '<hr></li>');
+              $('#commentList').append(newPost.uName + /*'<br>Rating: ' + newPost.uRating +*/ ', who left a star rating, says:<br><q>' + newPost.uComment + '</q><hr>');
             });
 
             </script>
-
-            <div id = "commentDisplayDiv" class = "floatRight">
-              Comments:<br>
-              <ol id="commentList"></ol>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
 
         </div>
@@ -255,7 +251,7 @@
       </div>
     </div>
 
-    <footer>
+    <footer id = "footer">
       Created by geeks making the world a bit better. Powered by Artyom.js speech recognition.
     </footer>
   </body>

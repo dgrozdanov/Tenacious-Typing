@@ -12,6 +12,12 @@ var style;
 var db;
 //Music
 var backgroundMusic;
+//howler
+var onIntro;
+var onMic;
+var onSpell;
+var onCorrect;
+var onGameOver;
 //Array
 var word;
 var soundArray;
@@ -66,7 +72,8 @@ firebase.initializeApp(config);
 
 // FirebaseUI config.
 var uiConfig = {
-	signInSuccessUrl: 'tenacious-typing.html',
+  signInFlow: 'popup',
+  signInSuccessUrl: 'tenacious-typing.html',
 	signInOptions: [
 		firebase.auth.GoogleAuthProvider.PROVIDER_ID,
 		firebase.auth.FacebookAuthProvider.PROVIDER_ID,
@@ -75,7 +82,7 @@ var uiConfig = {
 		firebase.auth.EmailAuthProvider.PROVIDER_ID
 	],
 	// Terms of service url.
-	tosUrl: '<your-tos-url>'
+	tosUrl: '../terms.html'
 };
 
 // Initialize the FirebaseUI Widget using Firebase.
@@ -88,6 +95,9 @@ ui.start('#firebaseui-auth-container', uiConfig);
 initApp = function() {
 	firebase.auth().onAuthStateChanged(function(user) {
 		if (user) {
+
+      $('#firebaseui-auth-container').hide();
+      $('#signOutButton').show();
 			// User is signed in.
 			var displayName = user.displayName;
 			var email = user.email;
@@ -136,16 +146,7 @@ initApp = function() {
 };
 
 window.addEventListener('load', function() {
-	initApp()
-});
-
-$('#signOutButton').on('click', function(event) {
-	firebase.auth().signOut().then(function() {
-		$('#loginDescription').html("<span class='glyphicon glyphicon-log-in'></span> Login");
-		console.log('Signed Out');
-	}, function(error) {
-		console.error('Sign Out Error', error);
-	});
+	initApp();
 });
 
 function launchGame() {
@@ -191,6 +192,12 @@ function launchGame() {
 	utterance = new SpeechSynthesisUtterance();
 	utterance.rate = 3;
 	utterance.volume = 1;
+  //Howler initialization
+  onIntro = "media/onIntro.m4a";
+  onMic = "media/onMic.m4a";
+  onCorrect = "media/onCorrect.m4a";
+  onSpell = "media/onSpell.m4a";
+  //onGameOver = "media/onGameOver.m4a";
 
 	$('#loginButton').on('click', function (event) {
 		signInWithPopup();
@@ -292,12 +299,61 @@ function launchGame() {
 		});
 	}
 
+  $('#promptButton').focus(function() {
+    computerSpeak("Submit a prompt");
+  });
+  $('#promptButton').mouseover(function() {
+    computerSpeak("Submit a prompt");
+  });
+
+  $('#commentButton').focus(function() {
+    computerSpeak("Leave a comment");
+  });
+  $('#commentButton').mouseover(function() {
+    computerSpeak("Leave a comment");
+  });
+
+  $('#scoresButton').focus(function() {
+    computerSpeak("High scores");
+  });
+  $('#scoresButton').mouseover(function() {
+    computerSpeak("High scores");
+  });
+
+  $('#skipButton').focus(function() {
+    computerSpeak("Skip this question");
+  });
+  $('#skipButton').mouseover(function() {
+    computerSpeak("Skip this question");
+  });
+
+  $('#muteButton').focus(function() {
+    computerSpeak("Mute the music");
+  });
+  $('#muteButton').mouseover(function() {
+    computerSpeak("Mute the music");
+  });
+
+  $('#resetButton').focus(function() {
+    computerSpeak("Reset the game");
+  });
+  $('#resetButton').mouseover(function() {
+    computerSpeak("Reset the game");
+  });
+
+  $('#loginButton').focus(function() {
+    computerSpeak("Login to the website");
+  });
+  $('#loginButton').mouseover(function() {
+    computerSpeak("Login to the website");
+  });
+
 	$('#unsupportedBrowser').fadeOut(10);
 
 	computerSpeak("Loading");
 
 	//*************************************PIXI**************************
-	app = new PIXI.Application(deviceWidth, deviceHeight*0.88, {backgroundColor : 0x1099bb});
+	app = new PIXI.Application(deviceWidth, deviceHeight*0.93, {backgroundColor : 0x1099bb});
 	document.body.appendChild(app.view);
 
 	style = new PIXI.TextStyle({
@@ -483,7 +539,8 @@ function launchGame() {
 			    app.ticker.add(function() {
 
 			        // update the text with a new string
-			        scoreText.text = 'Score: ' + points;
+              //scoreText.text = 'Navbar height: ' + $('navDiv').height() + ' footer height: ' + $('footer').height();
+              scoreText.text = 'Score: ' + points;
 							//mainText.fontSize += 1;
 			        // let's spin the spinning text
 			        //mainText.rotation += 0.03;
@@ -520,7 +577,10 @@ function launchGame() {
 			}
 
 			loaded = true;
-			playWelcome();
+      //computerSpeak("Welcome to Tenacious Typing!");
+			//playWelcome();
+      howlerSpeak(onIntro);
+      //howlerSpeak(onMic);
 		},
 		onplay: function() {
 
@@ -576,24 +636,34 @@ function optionRight() {
 	}
 }
 
+function howlerSpeak(toSpeak) {
+  var sound = new Howl({
+		src: [toSpeak],
+		volume: 1
+	});
+	sound.play();
+}
+
 function playWelcome() {
 	var sound = new Howl({
-		src: ["media/welcome.mp3"],
+		src: ["media/introAutoTune.m4a"],
 		volume: 1
 	});
 	sound.play();
 
-	/*computerSpeak("Do you have a microphone? Say yeah if you do, or press enter if you don't.");
-	if (isChrome) {
+
+	/*if (isChrome) {
+    computerSpeak("Do you have a microphone? Say yeah if you do, or press enter if you don't.");
 		setTimeout(function() {
 			choosingMode = false;
 		}, 5000);
 	}*/
+
 }
 
 function playPrompt() {
 	var sound = new Howl({
-		src: ["media/prompt.mp3"],
+		src: ["media/onSpell.m4a"],
 		volume: 1,
 		onend: function() {
 			computerSpeak(prompt[promptInc]);
@@ -604,7 +674,7 @@ function playPrompt() {
 
 function playGood() {
 	var sound = new Howl({
-		src: ["media/good.mp3"],
+		src: ["media/onCorrect.m4a"],
 		volume: 1,
 		onend: function() {
 			nextPrompt();
@@ -663,7 +733,8 @@ function checkAnswer() {
 			correct = false;
 		}, 3000);
 
-		playGood();
+		//playGood();
+    howlerSpeak(onCorrect);
 		return;
 	}
 
