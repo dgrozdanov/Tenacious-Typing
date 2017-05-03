@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--Background music: Closer To Jazz by Audionautix is licensed under a Creative Commons Attribution license (https://creativecommons.org/licenses/by/4.0/) Artist: http://audionautix.com/-->
+    <!-- Google Analytics -->
+    <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-92043516-1', 'auto');
+    ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    <meta charset = "utf-8">
+    <link rel = "icon" type = "image/png" href = "media/icons/maze-day.ico">
+    <title>Tenacious Typing</title>
+    <meta name = "description" content = "A fun way to get better at typing!">
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+    <script src="https://use.fontawesome.com/c87ebe651f.js"></script>
+    <link rel = "stylesheet" href = "CSS/typing.css">
+    <link rel = "stylesheet" href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.js"></script>
+    <script src="https://cdn.rawgit.com/yahoo/xss-filters/master/dist/xss-filters.js"></script>
+    <script type = "text/javascript" src = "../node_modules/artyom.js/src/artyom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.3.5/pixi.min.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.1/howler.js"></script>
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/1.0.0/firebaseui.css" />
+    <script src = "js/typing.js"></script>
+  </head>
+
+  <body onload = "launchGame()" data-spy="scroll" data-target=".navbar" data-offset="50">
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="http://grozd.co"><span class="glyphicon glyphicon-home"></span> grozd.co</a>
+        </div>
+        <div>
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+              <li><button class = "btn btn-primary navbar-btn" id = "promptButton" data-toggle = "modal" data-target = "#suggestionModal"><span class="glyphicon glyphicon-pencil"></span> Submit Prompts</button></li>
+              <li><button class = "btn btn-primary navbar-btn" id = "commentButton" data-toggle = "modal" data-target = "#commentModal"><span class="glyphicon glyphicon-comment"></span> Leave a Comment</button></li>
+              <li><button class = "btn btn-primary navbar-btn" id = "scoreButton" data-toggle = "modal" data-target = "#scoreModal"><span class="glyphicon glyphicon-stats"></span> High Scores</button></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown"><a class="dropdown-toggle" id = "changeBackground" data-toggle="dropdown" href="#"><i class="fa fa-paint-brush" aria-hidden="true"></i> Change Background <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><img src = "media/images/bg1.jpg" class = "img-thumbnail" id = "Ronda" alt = "Ronda" height = "50%" width = "50%" onclick = "changeBG(1)">Ronda</li>
+                  <li><img src = "media/images/bg2.jpg" class = "img-thumbnail" id = "Carmona" alt = "Carmona" height = "50%" width = "50%" onclick = "changeBG(2)">Carmona</li>
+                  <li><img src = "media/images/bg3.jpg" class = "img-thumbnail" id = "Gibraltar" alt = "Gibraltar" height = "50%" width = "50%" onclick = "changeBG(3)">Gibraltar</li>
+                  <li><img src = "media/images/bg4.jpg" class = "img-thumbnail" id = "Mediterranean" alt = "Mediterranean" height = "50%" width = "50%" onclick = "changeBG(4)">Mediterranean</li>
+                  <li><img src = "media/images/bg5.jpg" class = "img-thumbnail" id = "Paris" alt = "Paris" height = "50%" width = "50%" onclick = "changeBG(5)">Paris</li>
+                  <li><img src = "media/images/bg6.jpg" class = "img-thumbnail" id = "EiffelTower" alt = "Eiffel Tower" height = "50%" width = "50%" onclick = "changeBG(6)">Eiffel Tower</li>
+                  <li><img src = "media/images/bg7.jpg" class = "img-thumbnail" id = "Granada" alt = "Granada" height = "50%" width = "50%" onclick = "changeBG(7)">Granada</li>
+                  <li><img src = "media/images/bg8.jpg" class = "img-thumbnail" id = "Cordoba" alt = "Cordoba" height = "50%" width = "50%" onclick = "changeBG(8)">Cordoba</li>
+                  <li><img src = "media/images/bg9.jpg" class = "img-thumbnail" id = "StVincent" alt = "StVincent" height = "50%" width = "50%" onclick = "changeBG(9)">St. Vincent</li>
+                  <li><img src = "media/images/bg10.jpg" class = "img-thumbnail" id = "Lagos" alt = "Lagos" height = "50%" width = "50%" onclick = "changeBG(10)">Lagos</li>
+                </ul>
+              </li>
+              <li class="dropdown"><a class="dropdown-toggle" id = "changeColor" data-toggle="dropdown" href="#"><i class="fa fa-paint-brush" aria-hidden="true"></i> Change Color <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><div id = "colorRed" style = "background-color: red; text-align: center; height: 100px;" onclick="changeColor('red')">Red</div></li>
+                  <li><div id = "colorYellow" style = "background-color: yellow; text-align: center; height: 100px;" onclick="changeColor('yellow')">Yellow</div></li>
+                  <li><div id = "colorBlue" style = "background-color: blue; text-align: center; height: 100px;" onclick="changeColor('blue')">Blue</div></li>
+                  <li><div id = "colorGreen" style = "background-color: green; text-align: center; height: 100px;" onclick="changeColor('green')">Green</div></li>
+                  <li><div id = "colorOrange" style = "background-color: orange; text-align: center; height: 100px;" onclick="changeColor('orange')">Orange</div></li>
+                  <li><div id = "colorPurple" style = "background-color: purple; text-align: center; height: 100px;" onclick="changeColor('purple')">Purple</div></li>
+                  <li><div id = "colorPink" style = "background-color: pink; text-align: center; height: 100px;" onclick="changeColor('pink')">Pink</div></li>
+                </ul>
+              </li>
+              <li><button class = "btn btn-danger navbar-btn" id = "skipButton" onclick = "$('#skipButton').blur()"><span class="glyphicon glyphicon-fast-forward"></span> Skip Question</button></li>
+              <li><button class = "btn btn-danger navbar-btn" id = "muteButton" onclick = "$('#muteButton').blur()"><span class="glyphicon glyphicon-volume-off"></span> Toggle Music</button></li>
+              <li><button class = "btn btn-danger navbar-btn" id = "resetButton" onclick = "$('#resetButton').blur()"><span class="glyphicon glyphicon-repeat"></span> Reset Game</button></li>
+              <li><button class = "btn btn-primary navbar-btn" id = "loginButton" onclick = "$('#loginButton').blur()" data-toggle = "modal" data-target = "#loginModal"><div id = "loginDescription"><span class="glyphicon glyphicon-log-in"></span> Login</div></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Modals -->
+    <div class = "modal fade" id = "loginModal" role = "dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Sign in</h4>
+          </div>
+
+          <div class="modal-body">
+            <div id = "loggedInStatus">
+            </div>
+            <div id = "firebaseui-auth-container"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button class = "btn btn-danger navbar-btn" id = "signOutButton"> Sign out</button>
+
+            <script>
+            $('#signOutButton').on('click', function(event) {
+            	firebase.auth().signOut().then(function() {
+            		$('#loginDescription').html("<span class='glyphicon glyphicon-log-in'></span> Login");
+                $('#loggedInStatus').html("");
+            		console.log('Signed Out');
+            	}, function(error) {
+            		console.error('Sign Out Error', error);
+            	});
+              $('#firebaseui-auth-container').show();
+              $('#signOutButton').hide();
+            });
+            </script>
+
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class = "modal fade" id = "scoreModal" role = "dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">High Scores</h4>
+          </div>
+
+          <div class="modal-body">
+            <!--table-->
+            A list of our tenacious all-stars:<br>
+            <button class = "btn btn-danger navbar-btn" id = "submitScore"> Submit Score</button>
+            <div id = "scoreList">
+            </div>
+          </div>
+
+          <script>
+            $('#submitScore').on('click', function(event) {
+
+              displaySnackbar();
+
+              if (displayName == "") {
+                displayName = $("#nameInput").val();
+              }
+              var score = points;
+
+              var scorePush = db.ref().child("scores");
+
+              scorePush.push().set({
+                uName: xssFilters.inHTMLData(displayName),
+                //uRating: rating,
+                uScore: xssFilters.inHTMLData(score)
+              });
+            });
+
+            db = firebase.database();
+            var scoresRef = db.ref().child("scores");
+
+            //Retrieves new posts as they are added to the database
+            scoresRef.on("child_added", function(snapshot, prevChildKey) {
+              var newPost = snapshot.val();
+              //console.log("Previous Post ID: " + prevChildKey);
+              //$('#commentList').append('<li>Name: ' + newPost.uName + /*'<br>Rating: ' + newPost.uRating +*/ '<br>Comment: ' + newPost.uComment + '<hr></li>');
+              $('#scoreList').append('Tenacious Typer ' + newPost.uName + ' has scored ' + newPost.uScore + ' points!<hr>');
+            });
+          </script>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class = "modal fade" id="commentModal" role="dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class = "close" data-dismiss = "modal">&times;</button>
+            <h4 class = "modal-title">Comment Box</h4>
+          </div>
+
+          <div class = "modal-body row text-center">
+            <div class="col-sm-6">
+              <legend>What's your name?</legend>
+              <input id = "nameInput" name = "name" type = "text">
+              <br><br>
+
+              <legend>How do you rate this game?</legend>
+              <div class="rate">
+                <input type="radio" id="star5" name="rate" value="5" onmouseover = "computerSpeak('five stars', true)" onclick="setRating(5)" />
+                <label for="star5" title="Awesome">5 stars</label>
+                <input type="radio" id="star4" name="rate" value="4" onmouseover = "computerSpeak('four stars', true)" onclick="setRating(4)" />
+                <label for="star4" title="Good">4 stars</label>
+                <input type="radio" id="star3" name="rate" value="3" onmouseover = "computerSpeak('three stars', true)" onclick="setRating(3)" />
+                <label for="star3" title="Aight">3 stars</label>
+                <input type="radio" id="star2" name="rate" value="2" onmouseover = "computerSpeak('two stars', true)" onclick="setRating(2)" />
+                <label for="star2" title="Meh">2 stars</label>
+                <input type="radio" id="star1" name="rate" value="1" onmouseover = "computerSpeak('one stars', true)" onclick="setRating(1)" />
+                <label for="star1" title="Bye Felicia">1 star</label>
+              </div>
+
+              <br><br>
+              <legend>What's your comment?</legend>
+              <input id = "commentInput" name = "comment" type = "text">
+              <br><br>
+              <button class = "btn btn-danger navbar-btn" id = "submitComment"> Submit</button>
+
+            </div>
+
+            <div class="col-sm-6" id = "commentDisplayDiv">
+                <legend>Comments:</legend>
+                <div id="commentList"></div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class = "modal fade" id="suggestionModal" role="dialog">
+      <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+
+          <div class = "modal-header">
+            <button type = "button" class = "close" data-dismiss = "modal">&times;</button>
+            <h4 class = "modal-title">Suggestion Box</h4>
+          </div>
+
+          <div class = "modal-body row text-center">
+            <div class="col-sm-6">
+              <legend>Which word(s) would you like to see added?</legend>
+              Give your words a title! <input id = "suggestionTitle" name = "suggestion" type = "text">
+              <div id = "suggestionInput"></div>
+              <button class = "btn btn-danger navbar-btn" id = "addMoreSuggestions">Add More Boxes</button>
+              <br><br>
+              <button class = "btn btn-danger navbar-btn" id = "submitSuggestion">Submit</button>
+
+            </div>
+
+            <div class="col-sm-6" id = "suggestionDisplayDiv">
+                <legend>User suggestion(s):</legend>
+                <div id="suggestionList"></div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+      
+      var suggestionInc = 1;
+      document.getElementById('suggestionInput').innerHTML += ('<span>' + suggestionInc + ': <input id = "suggestionInput' + suggestionInc + '" name = "suggestion' + suggestionInc + '" type = "text"></span><br>');
+      $('#addMoreSuggestions').on('click', function(event) {
+        suggestionInc++;
+        document.getElementById('suggestionInput').innerHTML += ('<span>' + suggestionInc + ': <input id = "suggestionInput' + suggestionInc + '" name = "suggestion' + suggestionInc + '" type = "text"></span><br>');
+      });
+
+      $('#submitSuggestion').on('click', function(event) {
+
+        $('#snackbar').html("Thanks for leaving your suggestion(s)!");
+        displaySnackbar();
+
+        var suggestionPush = db.ref().child("suggestions/" + $(suggestionTitle).val());
+        var suggestionFormat;
+
+        for (i = 1; i <= suggestionInc; i++) {
+          suggestionFormat = "#suggestionInput" + i;
+          suggestionPush.push().set({
+            uSuggestion: xssFilters.inHTMLData($(suggestionFormat).val())
+          });
+        }
+        //db = firebase.database();
+        var suggestionRef = db.ref().child("suggestions/" + $(suggestionTitle).val());
+
+        //Retrieves new posts as they are added to the database
+        suggestionRef.on("child_added", function(snapshot, prevChildKey) {
+          var newPost = snapshot.val();
+          $('#suggestionList').append('Suggestion: ' + newPost.uSuggestion + '<br>');
+        });
+      });
+    </script>
+
+    <div id = "divLaunchGame">
+    </div>
+
+    <div id="snackbar"></div>
+
+    <footer id = "footer">
+      Created by geeks making the world a bit better. Powered by Artyom.js speech recognition.
+    </footer>
+  </body>
+</html>
